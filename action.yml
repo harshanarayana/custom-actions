@@ -1,11 +1,35 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Sanic Actions'
+description: 'GitHub Actions to Manage sanic-org repositories'
+author: 'sanic-org'
 inputs:
-  milliseconds: # change this
+  action:
+    required: false
+    description: 'Kind of Operation Being Performed using the Actions. Tests/Docs/SanityCheck/Analysis'
+    default: 'tests'
+  tox-env:
+    required: false
+    description: 'Name fo the Tox Environment to Run'
+    default: 'py37'
+  tox-version:
+    required: false
+    description: 'Version of the Tox to use for Running Tests'
+    default: 'latest'
+  python-version:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: "Version range or exact version of a Python version to use, using SemVer's version range syntax."
+    default: '3.x'
+  architecture:
+    description: 'The target architecture (x86, x64) of the Python interpreter.'
+    required: false
+  token:
+    description: Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
+    default: ${{ github.token }}
+    required: false
+outputs:
+  python-version:
+    description: "The installed python version. Useful when given a version range as input."
+  tox-version:
+    description: 'Currently installed version of the Tox Package'
 runs:
   using: 'node12'
   main: 'dist/index.js'

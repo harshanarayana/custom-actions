@@ -25,11 +25,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.6"
+    "@actions/core": "^1.2.6",
+    "@actions/glob": "^0.1.1",
+    "setup-python": "git+https://github.com/actions/setup-python.git"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.9",
+    "@types/semver": "^7.3.4",
     "@typescript-eslint/parser": "^4.8.1",
     "@vercel/ncc": "^0.25.1",
     "eslint": "^7.17.0",
