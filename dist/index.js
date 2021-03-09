@@ -36,14 +36,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.installPythonPackage = void 0;
+exports.setToolVersion = exports.buildWheelFiles = exports.installPythonPackage = void 0;
 const core = __importStar(__webpack_require__(2186));
 const exec = __importStar(__webpack_require__(1514));
+const generic_1 = __webpack_require__(1971);
 function installPythonPackage(infra) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!(yield infra.installRequired())) {
             core.info(`Package install check returned a false. Ignoring the setup of the test infra`);
-            return 0;
+            return Promise.resolve(0);
         }
         else {
             const options = {
@@ -68,11 +69,29 @@ function installPythonPackage(infra) {
                 throw new Error(`Error setting up ${infra.name} installation for version ${infra.version}`);
             }
             yield infra.setVersion();
-            return state;
+            return Promise.resolve(state);
         }
     });
 }
 exports.installPythonPackage = installPythonPackage;
+function buildWheelFiles() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return generic_1.commandRunner('python', ['-m', 'build', '--sdist', '--wheel', '--outdir', 'dist/'], true, data => {
+            core.info(data.toString().trim());
+        }, data => {
+            core.error(data.toString().trim());
+        });
+    });
+}
+exports.buildWheelFiles = buildWheelFiles;
+function setToolVersion(outputName, infra) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return generic_1.commandRunner(infra.name, ['--version'], true, data => {
+            core.setOutput(outputName, data.toString().trim());
+        }, null);
+    });
+}
+exports.setToolVersion = setToolVersion;
 
 
 /***/ }),
@@ -82,6 +101,25 @@ exports.installPythonPackage = installPythonPackage;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -93,24 +131,86 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runLinter = void 0;
+const core = __importStar(__webpack_require__(2186));
 const black_1 = __webpack_require__(7837);
 const comon_1 = __webpack_require__(6745);
-function runLinter(lintInfraName, lintInfraVersion, force, additionalArgs) {
+function runLinter() {
     return __awaiter(this, void 0, void 0, function* () {
-        switch (lintInfraName.toLowerCase()) {
+        const name = core.getInput('linter-infra-tool');
+        const version = core.getInput('linter-infra-version');
+        switch (name.toLowerCase()) {
             case 'black': {
-                const infra = black_1.getBlackInfra(lintInfraVersion, force, additionalArgs);
+                const infra = black_1.getBlackInfra(version, true, core.getInput('linter-additional-args'));
                 yield comon_1.installPythonPackage(infra);
                 yield infra.setVersion();
-                return yield infra.runLinter();
+                return infra.runLinter();
             }
             default: {
-                throw new Error(`Invalid Linter Infra with Name ${lintInfraName} and version ${lintInfraVersion}`);
+                throw new Error(`Invalid Linter Infra with Name ${name} and version ${version}`);
             }
         }
     });
 }
 exports.runLinter = runLinter;
+
+
+/***/ }),
+
+/***/ 322:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.runPackagePublish = void 0;
+const core = __importStar(__webpack_require__(2186));
+const twine_1 = __webpack_require__(340);
+const comon_1 = __webpack_require__(6745);
+function runPackagePublish() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const name = core.getInput('package-infra-name');
+        const version = core.getInput('package-infra-version');
+        switch (name.toLowerCase()) {
+            case 'twine': {
+                const infra = twine_1.getTwineInfra(version, true, '', core.getInput('pypi-user'), core.getInput('pypi-user-password'), core.getInput('pypi-access-token'), core.getInput('pypi-package-dir'), core.getInput('pypi-verify-metadata') === 'true', core.getInput('pypi-skip-existing') === 'true');
+                yield comon_1.installPythonPackage(infra);
+                return infra.runPackagePublish();
+            }
+            default: {
+                throw new Error(`Invalid Package Publish Infra with name ${name} and ${version}`);
+            }
+        }
+    });
+}
+exports.runPackagePublish = runPackagePublish;
 
 
 /***/ }),
@@ -148,15 +248,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setupPythonInfra = void 0;
 const core = __importStar(__webpack_require__(2186));
 const finder = __importStar(__webpack_require__(4238));
-function setupPythonInfra(version, arch) {
+const os_1 = __importDefault(__webpack_require__(2087));
+const pip_1 = __webpack_require__(5431);
+const comon_1 = __webpack_require__(6745);
+const build_1 = __webpack_require__(9300);
+function setupPythonInfra() {
     return __awaiter(this, void 0, void 0, function* () {
+        const version = core.getInput('python-version');
+        const arch = os_1.default.arch();
+        const pipVersion = core.getInput('pip-version');
         core.info(`##[python-install] Installing Python Version ${version} on ${arch}`);
         const installed = yield finder.findPythonVersion(version, arch);
         core.info(`##[python-install] Successfully setup ${installed.impl} (${installed.version})`);
+        const pipInfra = pip_1.getPipInfra(pipVersion);
+        yield comon_1.installPythonPackage(pipInfra);
+        const buildInfra = build_1.getBuildToolInfra('latest');
+        yield comon_1.installPythonPackage(buildInfra);
         return { impl: installed.impl, version: installed.version };
     });
 }
@@ -166,44 +280,6 @@ exports.setupPythonInfra = setupPythonInfra;
 /***/ }),
 
 /***/ 4340:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.runTests = void 0;
-const tox_1 = __webpack_require__(6333);
-const comon_1 = __webpack_require__(6745);
-function runTests(testInfraName, testInfraVersion, force, additionalArgs) {
-    return __awaiter(this, void 0, void 0, function* () {
-        switch (testInfraName.toLowerCase()) {
-            case 'tox': {
-                const infra = tox_1.getToxInfra(testInfraVersion, force, additionalArgs);
-                yield comon_1.installPythonPackage(infra);
-                yield infra.setVersion();
-                return yield infra.runTests();
-            }
-            default: {
-                throw new Error(`Invalid Test Infra with Name ${testInfraName} and version ${testInfraVersion}`);
-            }
-        }
-    });
-}
-exports.runTests = runTests;
-
-
-/***/ }),
-
-/***/ 7837:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -237,9 +313,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBlackInfra = void 0;
+exports.runTests = void 0;
 const core = __importStar(__webpack_require__(2186));
+const tox_1 = __webpack_require__(6333);
+const comon_1 = __webpack_require__(6745);
+function runTests() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const name = core.getInput('test-infra-tool');
+        const version = core.getInput('test-infra-version');
+        switch (name.toLowerCase()) {
+            case 'tox': {
+                const infra = tox_1.getToxInfra(version, core.getInput('test-tool-install-force') === 'true', core.getInput('test-additional-args'));
+                yield comon_1.installPythonPackage(infra);
+                yield infra.setVersion();
+                return infra.runTests();
+            }
+            default: {
+                throw new Error(`Invalid Test Infra with Name ${name} and version ${version}`);
+            }
+        }
+    });
+}
+exports.runTests = runTests;
+
+
+/***/ }),
+
+/***/ 7837:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getBlackInfra = void 0;
 const generic_1 = __webpack_require__(1971);
+const comon_1 = __webpack_require__(6745);
 class BlackInfra {
     constructor(version, force, additionalArg) {
         this.argMap = new Map();
@@ -256,14 +373,12 @@ class BlackInfra {
     }
     runLinter() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield generic_1.commandRunner('black', [], true, null, null);
+            return generic_1.commandRunner('black', [], true, null, null);
         });
     }
     setVersion() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield generic_1.commandRunner('black', ['--version'], true, (data) => {
-                core.setOutput('linter-infra-version', data.toString().trim());
-            }, null);
+            return comon_1.setToolVersion('linter-infra-version', this);
         });
     }
 }
@@ -313,38 +428,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(2186));
-const os_1 = __importDefault(__webpack_require__(2087));
 const path_1 = __importDefault(__webpack_require__(5622));
 const python_1 = __webpack_require__(8903);
 const test_infra_1 = __webpack_require__(4340);
 const lint_infra_1 = __webpack_require__(8986);
+const package_infra_1 = __webpack_require__(322);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const action = core.getInput('action');
-            // Base Python Infra
-            const version = core.getInput('python-version');
-            const arch = core.getInput('architecture') || os_1.default.arch();
-            // Test Tool Version
-            const testToolName = core.getInput('test-infra-tool');
-            const testToolVersion = core.getInput('test-infra-version');
-            const additionalTestArgs = core.getInput('additional-test-args');
-            const force = core.getInput('force-test-tool-install').toLowerCase() === 'true';
-            // linter tool config
-            const linterToolName = core.getInput('linter-infra-tool');
-            const linterToolVersion = core.getInput('linter-infra-version');
-            const additionalLinterArgs = core.getInput('additional-linter-args');
-            yield python_1.setupPythonInfra(version, arch);
+            yield python_1.setupPythonInfra();
             const matchersPath = path_1.default.join(__dirname, '..', '.github');
             core.info(`##[add-matcher]${path_1.default.join(matchersPath, 'python.json')}`);
             switch (action.toLowerCase()) {
                 case 'tests':
                 case 'test':
-                    yield test_infra_1.runTests(testToolName, testToolVersion, force, additionalTestArgs);
+                    yield test_infra_1.runTests();
                     break;
                 case 'lint':
                 case 'linter':
-                    yield lint_infra_1.runLinter(linterToolName, linterToolVersion, true, additionalLinterArgs);
+                    yield lint_infra_1.runLinter();
+                    break;
+                case 'publish':
+                case 'pypi':
+                case 'package-publish':
+                    yield package_infra_1.runPackagePublish();
                     break;
                 default:
                     core.info(`Plugin action ${action} is a non supported entity`);
@@ -356,6 +464,229 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 9300:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getBuildToolInfra = void 0;
+class BuildInfra {
+    constructor(version, force, additionalArg) {
+        this.name = 'build';
+        this.version = version;
+        this.force = force;
+        this.additionalArgs = additionalArg;
+    }
+    installRequired() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.resolve(true);
+        });
+    }
+    setVersion() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.resolve(0);
+        });
+    }
+}
+function getBuildToolInfra(version) {
+    return new BuildInfra(version, true, '');
+}
+exports.getBuildToolInfra = getBuildToolInfra;
+
+
+/***/ }),
+
+/***/ 5431:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPipInfra = void 0;
+const comon_1 = __webpack_require__(6745);
+class PipInfra {
+    constructor(version, force, additionalArg) {
+        this.name = 'pip';
+        this.version = version;
+        this.force = force;
+        this.additionalArgs = additionalArg;
+    }
+    installRequired() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.resolve(true);
+        });
+    }
+    setVersion() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return comon_1.setToolVersion('pip-version', this);
+        });
+    }
+}
+function getPipInfra(version) {
+    return new PipInfra(version, true, '');
+}
+exports.getPipInfra = getPipInfra;
+
+
+/***/ }),
+
+/***/ 340:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getTwineInfra = void 0;
+const glob = __importStar(__webpack_require__(8090));
+const core = __importStar(__webpack_require__(2186));
+const generic_1 = __webpack_require__(1971);
+const comon_1 = __webpack_require__(6745);
+class TwineInfra {
+    constructor(version, force, additionalArg, pypiUser, pypiPassword, pypiAccessToken, packageDir, verifyMetadata, skipExisting) {
+        this.argMap = new Map();
+        this.name = 'twine';
+        this.version = version;
+        this.force = force;
+        this.additionalArgs = additionalArg;
+        this.argMap = generic_1.argToMap(additionalArg);
+        this.packageDir = packageDir;
+        this.pypiUser = pypiUser;
+        this.pypiPassword = pypiPassword;
+        this.pypiAccessToken = pypiAccessToken;
+        this.verifyMetadata = verifyMetadata;
+        this.skipExisting = skipExisting;
+    }
+    installRequired() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return true;
+        });
+    }
+    checkPackageBuildState() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const g = yield glob.create([`${this.packageDir}/*.tar.gz`, `${this.packageDir}/*.whl`].join('\n'), {
+                followSymbolicLinks: false
+            });
+            const files = yield g.glob();
+            return files.length >= 2;
+        });
+    }
+    runPackagePublish() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield comon_1.buildWheelFiles();
+            const distBuilt = yield this.checkPackageBuildState();
+            if (!distBuilt) {
+                throw new Error(`PyPi publish will not continue as we did not find any wheel or tar.gz artifact to publish`);
+            }
+            const additionalArgs = ['upload', '--verbose'];
+            if (this.skipExisting || this.argMap.get('--skip-existing') === 'true') {
+                additionalArgs.push('--skip-existing');
+            }
+            if (this.verifyMetadata) {
+                const state = yield generic_1.commandRunner('twine', ['check', `${this.packageDir}/*`], true, null, null);
+                if (state !== 0) {
+                    throw new Error('Failed to Perform metadata Check using Twine. Publishing will be terminated');
+                }
+            }
+            const env = new Map();
+            env.set('TWINE_USERNAME', this.pypiUser);
+            env.set('TWINE_PASSWORD', this.pypiPassword);
+            const state = yield generic_1.commandRunnerWithEnv('twine', additionalArgs, true, env, null, null);
+            if (state !== 0) {
+                throw new Error('Failed to publish Python package to PyPi');
+            }
+            return Promise.resolve(state);
+        });
+    }
+    setVersion() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return comon_1.setToolVersion('package-infra-version', this);
+        });
+    }
+    setupPreRequisites(infra) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return comon_1.installPythonPackage(infra);
+        });
+    }
+    validate() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let useToken = false;
+            if (this.pypiAccessToken.length > 0 && this.pypiAccessToken !== '##DEFAULT##') {
+                core.info('Using PyPi Access Token to publish the packages to the Registry');
+                useToken = true;
+            }
+            if (useToken && !this.pypiAccessToken.startsWith('pypi-')) {
+                core.error("You have Provided a PyPi Access token but it doesn't start with 'pypi-' like it should. " +
+                    'Will attempt to use the Username and Password if available');
+                useToken = false;
+            }
+            else {
+                this.pypiUser = '__token__';
+                this.pypiPassword = this.pypiAccessToken;
+            }
+            if (((this.pypiUser.length > 0 && this.pypiUser === '##DEFAULT##') ||
+                (this.pypiPassword.length > 0 && this.pypiPassword === '##DEFAULT##')) &&
+                !useToken) {
+                throw new Error('Either PyPi Username and Password or PyPi access token needs to be provided');
+            }
+            return Promise.resolve(true);
+        });
+    }
+}
+function getTwineInfra(version, force, additionalArg, pypiUser, pypiPassword, pypiAccessToken, packageDir, verifyMetadata, skipExisting) {
+    return new TwineInfra(version, force, additionalArg, pypiUser, pypiPassword, pypiAccessToken, packageDir, verifyMetadata, skipExisting);
+}
+exports.getTwineInfra = getTwineInfra;
 
 
 /***/ }),
@@ -560,7 +891,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.commandRunner = exports.argToMap = void 0;
+exports.commandRunner = exports.commandRunnerWithEnv = exports.argToMap = void 0;
 const exec = __importStar(__webpack_require__(1514));
 const core = __importStar(__webpack_require__(2186));
 function argToMap(additionalArgs) {
@@ -580,6 +911,28 @@ function defaultStdErrCallback() {
         core.error(data.toString().trim());
     };
 }
+function commandRunnerWithEnv(cmd, args, silent, env, stdoutCallback, stderrCallback) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const opts = {
+            silent,
+            listeners: {
+                stdout: stderrCallback || defaultStdOutCallback,
+                stderr: stderrCallback || defaultStdErrCallback
+            }
+        };
+        if (env !== undefined && env.size > 0) {
+            // eslint-disable-next-line github/array-foreach
+            env.forEach((value, key) => {
+                process.env[key] = value;
+            });
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            opts.env = Object.assign({}, process.env);
+        }
+        return exec.exec(cmd, args, opts);
+    });
+}
+exports.commandRunnerWithEnv = commandRunnerWithEnv;
 function commandRunner(cmd, args, silent, stdoutCallback, stderrCallback) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = {
@@ -589,7 +942,7 @@ function commandRunner(cmd, args, silent, stdoutCallback, stderrCallback) {
                 stderr: stderrCallback || defaultStdErrCallback
             }
         };
-        return yield exec.exec(cmd, args, opts);
+        return exec.exec(cmd, args, opts);
     });
 }
 exports.commandRunner = commandRunner;

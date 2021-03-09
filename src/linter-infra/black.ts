@@ -1,6 +1,6 @@
-import * as core from '@actions/core'
 import {LinterInfra} from '../types/types'
 import {argToMap, commandRunner} from '../utils/generic'
+import {setToolVersion} from '../core/comon'
 
 class BlackInfra implements LinterInfra {
     additionalArgs: string
@@ -22,19 +22,11 @@ class BlackInfra implements LinterInfra {
     }
 
     async runLinter(): Promise<number> {
-        return await commandRunner('black', [], true, null, null)
+        return commandRunner('black', [], true, null, null)
     }
 
     async setVersion(): Promise<number> {
-        return await commandRunner(
-            'black',
-            ['--version'],
-            true,
-            (data: Buffer) => {
-                core.setOutput('linter-infra-version', data.toString().trim())
-            },
-            null
-        )
+        return setToolVersion('linter-infra-version', this)
     }
 }
 

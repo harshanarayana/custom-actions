@@ -1,21 +1,23 @@
+import * as core from '@actions/core'
 import {getToxInfra} from '../test-infra/tox'
 import {installPythonPackage} from './comon'
 
-export async function runTests(
-    testInfraName: string,
-    testInfraVersion: string,
-    force: boolean,
-    additionalArgs: string
-): Promise<number> {
-    switch (testInfraName.toLowerCase()) {
+export async function runTests(): Promise<number> {
+    const name = core.getInput('test-infra-tool')
+    const version = core.getInput('test-infra-version')
+    switch (name.toLowerCase()) {
         case 'tox': {
-            const infra = getToxInfra(testInfraVersion, force, additionalArgs)
+            const infra = getToxInfra(
+                version,
+                core.getInput('test-tool-install-force') === 'true',
+                core.getInput('test-additional-args')
+            )
             await installPythonPackage(infra)
             await infra.setVersion()
-            return await infra.runTests()
+            return infra.runTests()
         }
         default: {
-            throw new Error(`Invalid Test Infra with Name ${testInfraName} and version ${testInfraVersion}`)
+            throw new Error(`Invalid Test Infra with Name ${name} and version ${version}`)
         }
     }
 }

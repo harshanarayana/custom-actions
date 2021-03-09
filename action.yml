@@ -1,6 +1,9 @@
 name: 'Sanic Actions'
 description: 'GitHub Actions to Manage sanic-org repositories'
 author: 'sanic-org'
+branding:
+  color: 'green'
+  icon: 'terminal'
 inputs:
   action:
     required: false
@@ -14,11 +17,11 @@ inputs:
     required: false
     description: 'Version of the Test Management infrastructure'
     default: 'latest'
-  additional-test-args:
+  test-additional-args:
     required: false
     description: 'Additional Arguments to be passed onto the Test Infra'
     default: ''
-  force-test-tool-install:
+  test-tool-install-force:
     required: false
     description: 'Force Install the Test tool even if the Env does not need it'
     default: "false"
@@ -30,7 +33,7 @@ inputs:
     required: false
     description: 'Install a specific version of linter tool chain as required'
     default: 'latest'
-  additional-linter-args:
+  linter-additional-args:
     required: false
     description: 'Additional Override argument to be passed to the Linter'
     default: ''
@@ -45,6 +48,42 @@ inputs:
     description: Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
     default: ${{ github.token }}
     required: false
+  package-infra-name:
+    required: false
+    description: 'Python Package Publisher toolchain'
+    default: 'twine'
+  package-infra-version:
+    required: false
+    description: 'Version of the package publishing Infra to use'
+    default: 'latest'
+  pypi-user:
+    required: false
+    description: 'PyPi User name while publishing Package'
+    default: '##DEFAULT##'
+  pypi-user-password:
+    required: false
+    description: 'PyPi User password while publishing package'
+    default: '##DEFAULT##'
+  pypi-access-token:
+    required: false
+    description: 'PyPI Access token if you want to bypass user and password'
+    default: '##DEFAULT##'
+  pypi-package-dir:
+    required: false
+    description: 'Directory to use for creating Dist packages'
+    default: 'dist'
+  pypi-verify-metadata:
+    required: false
+    description: 'Verify package metadata before publishing'
+    default: 'true'
+  pypi-skip-exisint:
+    required: false
+    description: 'Skip If the Version of the package already exists for publishing'
+    default: 'true'
+  pip-version:
+    required: false
+    description: 'Use a specified version of Pip for Setting up the infra'
+    default: 'latest'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."
@@ -52,6 +91,10 @@ outputs:
     description: 'Currently installed version of the Test Infra Package'
   linter-infra-version:
     description: 'Version of the Linter tool configured'
+  pip-version:
+    description: 'Version of the Pip Package Installed'
+  package-infra-version:
+    description: 'Package Deployment Infra Version'
 runs:
   using: 'node12'
   main: 'dist/index.js'

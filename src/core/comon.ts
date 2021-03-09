@@ -1,12 +1,13 @@
-import {LinterInfra, TestInfra} from '../types/types'
+import {BaseInfra} from '../types/types'
 import * as core from '@actions/core'
 import {ExecOptions} from '@actions/exec/lib/interfaces'
 import * as exec from '@actions/exec'
+import {commandRunner} from '../utils/generic'
 
-export async function installPythonPackage(infra: TestInfra | LinterInfra): Promise<number> {
+export async function installPythonPackage(infra: BaseInfra): Promise<number> {
     if (!(await infra.installRequired())) {
         core.info(`Package install check returned a false. Ignoring the setup of the test infra`)
-        return 0
+        return Promise.resolve(0)
     } else {
         const options: ExecOptions = {
             silent: true,
@@ -29,6 +30,32 @@ export async function installPythonPackage(infra: TestInfra | LinterInfra): Prom
             throw new Error(`Error setting up ${infra.name} installation for version ${infra.version}`)
         }
         await infra.setVersion()
-        return state
+        return Promise.resolve(state)
     }
+}
+
+export async function buildWheelFiles(): Promise<number> {
+    return commandRunner(
+        'python',
+        ['-m', 'build', '--sdist', '--wheel', '--outdir', 'dist/'],
+        true,
+        data => {
+            core.info(data.toString().trim())
+        },
+        data => {
+            core.error(data.toString().trim())
+        }
+    )
+}
+
+export async function setToolVersion(outputName: string, infra: BaseInfra): Promise<number> {
+    return commandRunner(
+        infra.name,
+        ['--version'],
+        true,
+        data => {
+            core.setOutput(outputName, data.toString().trim())
+        },
+        null
+    )
 }
