@@ -24,12 +24,16 @@ function defaultStdErrLineCallback(): (data: string) => void {
 
 function defaultStdOutCallback(): (data: Buffer) => void {
     return (data: Buffer) => {
+        // eslint-disable-next-line no-console
+        console.log(data.toString().trim())
         core.info(data.toString().trim())
     }
 }
 
 function defaultStdErrCallback(): (data: Buffer) => void {
     return (data: Buffer) => {
+        // eslint-disable-next-line no-console
+        console.log(data.toString().trim())
         core.error(data.toString().trim())
     }
 }

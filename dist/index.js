@@ -1115,11 +1115,15 @@ function defaultStdErrLineCallback() {
 }
 function defaultStdOutCallback() {
     return (data) => {
+        // eslint-disable-next-line no-console
+        console.log(data.toString().trim());
         core.info(data.toString().trim());
     };
 }
 function defaultStdErrCallback() {
     return (data) => {
+        // eslint-disable-next-line no-console
+        console.log(data.toString().trim());
         core.error(data.toString().trim());
     };
 }

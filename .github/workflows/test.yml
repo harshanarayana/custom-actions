@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - uses: harshanarayana/custom-actions@main
         with:
           python-version: 3.7
   build-image:
@@ -29,7 +29,7 @@ jobs:
         docker-image-suffix: [ py37, py38 ]
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - uses: harshanarayana/custom-actions@main
         with:
           dockerfile-base-dir: './docker'
           docker-image-suffix: ${{ matrix.docker-image-suffix }}
