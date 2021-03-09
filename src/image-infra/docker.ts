@@ -53,6 +53,8 @@ class DockerInfra implements ImageInfra {
                 [
                     'build',
                     '.',
+                    '--pull',
+                    '--no-cache',
                     '-f',
                     `${this.dockerFilePath}/Dockerfile-${this.imageSuffix}`,
                     '-t',

@@ -30,8 +30,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: harshanarayana/custom-actions@main
+        id: build-image
         with:
           dockerfile-base-dir: './docker'
           docker-image-suffix: ${{ matrix.docker-image-suffix }}
           action: 'image-publish'
           ignore-python-setup: 'true'
+      - run: echo "output set by ${{ steps.build-image.outputs.image-infra-version }}"

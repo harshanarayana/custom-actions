@@ -472,6 +472,8 @@ class DockerInfra {
                 const buildState = yield generic_1.commandRunner('docker', [
                     'build',
                     '.',
+                    '--pull',
+                    '--no-cache',
                     '-f',
                     `${this.dockerFilePath}/Dockerfile-${this.imageSuffix}`,
                     '-t',
