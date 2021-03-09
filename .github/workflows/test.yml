@@ -9,10 +9,6 @@ on: # rebuild any PRs and main branch changes
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        docker-image-suffix: [py37, py38]
-
     steps:
       - uses: actions/checkout@v2
       - run: |
@@ -28,6 +24,9 @@ jobs:
           python-version: 3.7
   build-image:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker-image-suffix: [ py37, py38 ]
     steps:
       - uses: actions/checkout@v2
       - uses: ./
