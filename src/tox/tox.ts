@@ -94,6 +94,7 @@ class ToxInfra implements TestInfra {
       const valid = await this.testIfValidToxEnv()
       if (valid === NonToxRepo) {
         core.info('You are on a non tox repository. No action to be performed')
+        return 0
       }
       if (valid === InvalidToxEnv) {
         throw new Error(

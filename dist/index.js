@@ -340,6 +340,7 @@ class ToxInfra {
                 const valid = yield this.testIfValidToxEnv();
                 if (valid === common_1.NonToxRepo) {
                     core.info('You are on a non tox repository. No action to be performed');
+                    return 0;
                 }
                 if (valid === common_1.InvalidToxEnv) {
                     throw new Error(`Invalid Test Environment for tox specified as ${this.argMap.get('-e')}`);
