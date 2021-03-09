@@ -112,6 +112,10 @@ inputs:
     required: false
     description: 'In case if you have the docker file defined in sub path, you can specify that directory'
     default: '.'
+  image-infra-tool:
+    required: false
+    description: 'Tool chain to use for building docker images'
+    default: 'docker'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."
