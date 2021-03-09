@@ -2,7 +2,7 @@ require('./sourcemap-register.js');module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 231:
+/***/ 8903:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -52,7 +52,7 @@ exports.setupPythonInfra = setupPythonInfra;
 
 /***/ }),
 
-/***/ 6806:
+/***/ 4340:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -89,7 +89,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runTests = void 0;
 const core = __importStar(__webpack_require__(2186));
 const exec = __importStar(__webpack_require__(1514));
-const tox_1 = __webpack_require__(4617);
+const tox_1 = __webpack_require__(6333);
 function installTestInfra(infra) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!(yield infra.installRequired())) {
@@ -183,11 +183,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(2186));
 const os_1 = __importDefault(__webpack_require__(2087));
 const path_1 = __importDefault(__webpack_require__(5622));
-const python_1 = __webpack_require__(231);
-const test_infra_1 = __webpack_require__(6806);
+const python_1 = __webpack_require__(8903);
+const test_infra_1 = __webpack_require__(4340);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const action = core.getInput('action');
             const testToolName = core.getInput('text-infra-tool');
             const testToolVersion = core.getInput('test-infra-version');
             const additionalTestArgs = core.getInput('additional-test-args');
@@ -197,7 +198,14 @@ function run() {
             yield python_1.setupPythonInfra(version, arch);
             const matchersPath = path_1.default.join(__dirname, '..', '.github');
             core.info(`##[add-matcher]${path_1.default.join(matchersPath, 'python.json')}`);
-            yield test_infra_1.runTests(testToolName, testToolVersion, force, additionalTestArgs);
+            switch (action.toLowerCase()) {
+                case 'tests':
+                case 'test':
+                    yield test_infra_1.runTests(testToolName, testToolVersion, force, additionalTestArgs);
+                    break;
+                default:
+                    core.info(`Plugin action ${action} is a non supported entity`);
+            }
         }
         catch (err) {
             core.setFailed(err.message);
@@ -209,7 +217,7 @@ run();
 
 /***/ }),
 
-/***/ 6119:
+/***/ 2243:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -223,7 +231,7 @@ exports.ValidToxEnv = 'Valid';
 
 /***/ }),
 
-/***/ 4617:
+/***/ 6333:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -261,7 +269,7 @@ exports.getToxInfra = void 0;
 const glob = __importStar(__webpack_require__(8090));
 const core = __importStar(__webpack_require__(2186));
 const exec = __importStar(__webpack_require__(1514));
-const common_1 = __webpack_require__(6119);
+const common_1 = __webpack_require__(2243);
 class ToxInfra {
     constructor(version, force, additionalArg) {
         this.argMap = new Map();

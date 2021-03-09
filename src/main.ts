@@ -6,6 +6,7 @@ import {runTests} from './core/test-infra'
 
 async function run(): Promise<void> {
   try {
+    const action = core.getInput('action')
     const testToolName = core.getInput('text-infra-tool')
     const testToolVersion = core.getInput('test-infra-version')
     const additionalTestArgs = core.getInput('additional-test-args')
@@ -16,7 +17,14 @@ async function run(): Promise<void> {
     await setupPythonInfra(version, arch)
     const matchersPath = path.join(__dirname, '..', '.github')
     core.info(`##[add-matcher]${path.join(matchersPath, 'python.json')}`)
-    await runTests(testToolName, testToolVersion, force, additionalTestArgs)
+    switch (action.toLowerCase()) {
+      case 'tests':
+      case 'test':
+        await runTests(testToolName, testToolVersion, force, additionalTestArgs)
+        break
+      default:
+        core.info(`Plugin action ${action} is a non supported entity`)
+    }
   } catch (err) {
     core.setFailed(err.message)
   }
