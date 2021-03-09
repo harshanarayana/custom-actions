@@ -10,6 +10,18 @@ export function argToMap(additionalArgs: string): Map<string, string> {
     return new Map<string, string>(argArray)
 }
 
+function defaultStdOutLineCallback(): (data: string) => void {
+    return (data: string) => {
+        core.info(data)
+    }
+}
+
+function defaultStdErrLineCallback(): (data: string) => void {
+    return (data: string) => {
+        core.info(data)
+    }
+}
+
 function defaultStdOutCallback(): (data: Buffer) => void {
     return (data: Buffer) => {
         core.info(data.toString().trim())
@@ -22,19 +34,27 @@ function defaultStdErrCallback(): (data: Buffer) => void {
     }
 }
 
-export async function commandRunnerWithEnv(
-    cmd: string,
-    args: string[],
+function createExecOpts(
+    bufferMode: boolean,
     silent: boolean,
     env: Map<string, string>,
     stdoutCallback: ((data: Buffer) => void) | null,
-    stderrCallback: ((data: Buffer) => void) | null
-): Promise<number> {
+    stderrCallback: ((data: Buffer) => void) | null,
+    stdLineCallback: ((data: string) => void) | null,
+    errLineCallback: ((data: string) => void) | null
+): ExecOptions {
     const opts: ExecOptions = {
-        silent,
-        listeners: {
-            stdout: stderrCallback || defaultStdOutCallback,
+        silent
+    }
+    if (bufferMode) {
+        opts.listeners = {
+            stdout: stdoutCallback || defaultStdOutCallback,
             stderr: stderrCallback || defaultStdErrCallback
+        }
+    } else {
+        opts.listeners = {
+            stdline: stdLineCallback || defaultStdOutLineCallback,
+            errline: errLineCallback || defaultStdErrLineCallback
         }
     }
     if (env !== undefined && env.size > 0) {
@@ -48,6 +68,18 @@ export async function commandRunnerWithEnv(
             ...process.env
         }
     }
+    return opts
+}
+
+export async function commandRunnerWithEnv(
+    cmd: string,
+    args: string[],
+    silent: boolean,
+    env: Map<string, string>,
+    stdoutCallback: ((data: Buffer) => void) | null,
+    stderrCallback: ((data: Buffer) => void) | null
+): Promise<number> {
+    const opts = createExecOpts(true, silent, env, stdoutCallback, stderrCallback, null, null)
     return exec.exec(cmd, args, opts)
 }
 
@@ -58,12 +90,18 @@ export async function commandRunner(
     stdoutCallback: ((data: Buffer) => void) | null,
     stderrCallback: ((data: Buffer) => void) | null
 ): Promise<number> {
-    const opts: ExecOptions = {
-        silent,
-        listeners: {
-            stdout: stderrCallback || defaultStdOutCallback,
-            stderr: stderrCallback || defaultStdErrCallback
-        }
-    }
+    const opts = createExecOpts(true, silent, new Map<string, string>(), stdoutCallback, stderrCallback, null, null)
+    return exec.exec(cmd, args, opts)
+}
+
+export async function commandRunnerWithLineCallback(
+    cmd: string,
+    args: string[],
+    silent: boolean,
+    env: Map<string, string>,
+    stdLineCallback: ((data: string) => void) | null,
+    errLineCallback: ((data: string) => void) | null
+): Promise<number> {
+    const opts = createExecOpts(false, silent, env, null, null, stdLineCallback, errLineCallback)
     return exec.exec(cmd, args, opts)
 }

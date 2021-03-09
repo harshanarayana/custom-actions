@@ -84,6 +84,34 @@ inputs:
     required: false
     description: 'Use a specified version of Pip for Setting up the infra'
     default: 'latest'
+  docker-image-suffix:
+    required: false
+    description: 'Unique Identifier to indicate which Dockerfile-py37 to use for build the Image'
+    default: 'py37'
+  tag-image-as-latest:
+    required: false
+    description: 'Tag Image using the base Prefix and tag as latest'
+    default: 'true'
+  registry-url:
+    required: false
+    description: 'Name of the Docker or any other registry to use for pushing docker images'
+    default: 'docker.io'
+  registry-auth-user:
+    required: false
+    description: 'Docker Registry user for publishing the Image'
+    default: 'myfakeuser'
+  registry-auth-password:
+    required: false
+    description: 'Password to authenticate against the docker registry'
+    default: 'myfakepassword'
+  docker-image-base-name:
+    required: false
+    description: 'Base Image path for pushing the docker'
+    default: 'sanicframework/sanic'
+  dockerfile-base-dir:
+    required: false
+    description: 'In case if you have the docker file defined in sub path, you can specify that directory'
+    default: '.'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."
@@ -95,6 +123,8 @@ outputs:
     description: 'Version of the Pip Package Installed'
   package-infra-version:
     description: 'Package Deployment Infra Version'
+  image-infra-version:
+    description: 'Version of the Infra used to build the docker images'
 runs:
   using: 'node12'
   main: 'dist/index.js'

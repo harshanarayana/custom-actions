@@ -9,6 +9,10 @@ on: # rebuild any PRs and main branch changes
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker-image-suffix: [py37, py38]
+
     steps:
       - uses: actions/checkout@v2
       - run: |
@@ -22,3 +26,5 @@ jobs:
       - uses: ./
         with:
           python-version: 3.7
+          dockerfile-base-dir: './docker'
+          docker-image-suffix: ${{ matrix.docker-image-suffix }}

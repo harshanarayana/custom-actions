@@ -5,6 +5,7 @@ import {setupPythonInfra} from './core/python'
 import {runTests} from './core/test-infra'
 import {runLinter} from './core/lint-infra'
 import {runPackagePublish} from './core/package-infra'
+import {runImageBuilder} from './core/image-infra'
 
 async function run(): Promise<void> {
     try {
@@ -25,6 +26,11 @@ async function run(): Promise<void> {
             case 'pypi':
             case 'package-publish':
                 await runPackagePublish()
+                break
+            case 'image-publish':
+            case 'docker-build':
+            case 'docker-image':
+                await runImageBuilder()
                 break
             default:
                 core.info(`Plugin action ${action} is a non supported entity`)

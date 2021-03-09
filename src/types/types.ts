@@ -33,3 +33,20 @@ export interface PackagePublishInfra extends BaseInfra {
     runPackagePublish(): Promise<number>
     validate(): Promise<boolean>
 }
+
+export interface ImageInfra extends BaseInfra {
+    tagAsLatest: boolean
+    imageSuffix: string
+    gitTag: string
+    registryUser: string
+    registryPassword: string
+    registryUrl: string
+    imageBaseName: string
+    dockerFilePath: string
+    push: boolean
+
+    setup(): Promise<void>
+    buildImage(): Promise<void>
+    login(): Promise<void>
+    pushImage(): Promise<void>
+}
