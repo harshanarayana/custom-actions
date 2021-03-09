@@ -26,5 +26,12 @@ jobs:
       - uses: ./
         with:
           python-version: 3.7
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
           dockerfile-base-dir: './docker'
           docker-image-suffix: ${{ matrix.docker-image-suffix }}
+          action: 'image-publish'
