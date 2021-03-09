@@ -49,7 +49,10 @@ function createExecOpts(
     if (bufferMode) {
         opts.listeners = {
             stdout: stdoutCallback || defaultStdOutCallback,
-            stderr: stderrCallback || defaultStdErrCallback
+            stderr: stderrCallback || defaultStdErrCallback,
+            stdline: stdLineCallback || defaultStdOutLineCallback,
+            errline: errLineCallback || defaultStdErrLineCallback,
+            debug: defaultStdOutLineCallback
         }
     } else {
         opts.listeners = {
