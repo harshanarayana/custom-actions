@@ -335,6 +335,10 @@ class ToxInfra {
     }
     runTests() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!(yield this.installRequired())) {
+                core.info(`No Tooling for running tox was installed. Test will be skipped`);
+                return 0;
+            }
             const additionalArg = [];
             if (this.envName().length > 0) {
                 const valid = yield this.testIfValidToxEnv();
@@ -367,6 +371,10 @@ class ToxInfra {
     }
     setVersion() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!(yield this.installRequired())) {
+                core.setOutput('test-infra-version', 'na');
+                return 0;
+            }
             const options = {
                 silent: true,
                 listeners: {

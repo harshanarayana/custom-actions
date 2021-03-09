@@ -89,6 +89,12 @@ class ToxInfra implements TestInfra {
   }
 
   async runTests(): Promise<number> {
+    if (!(await this.installRequired())) {
+      core.info(
+        `No Tooling for running tox was installed. Test will be skipped`
+      )
+      return 0
+    }
     const additionalArg: string[] = []
     if (this.envName().length > 0) {
       const valid = await this.testIfValidToxEnv()
@@ -126,6 +132,10 @@ class ToxInfra implements TestInfra {
   }
 
   async setVersion(): Promise<number> {
+    if (!(await this.installRequired())) {
+      core.setOutput('test-infra-version', 'na')
+      return 0
+    }
     const options: ExecOptions = {
       silent: true,
       listeners: {
