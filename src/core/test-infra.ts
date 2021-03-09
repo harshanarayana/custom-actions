@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import {ExecOptions} from '@actions/exec/lib/interfaces'
-import {getToxInfra} from '../tox/tox'
+import {getToxInfra} from '../test-infra/tox'
 
 export interface TestInfra {
   name: string

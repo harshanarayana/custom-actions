@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 import os from 'os'
 import path from 'path'
-import {setupPythonInfra} from './install/python'
-import {runTests} from './install/test-infra'
+import {setupPythonInfra} from './core/python'
+import {runTests} from './core/test-infra'
 
 async function run(): Promise<void> {
   try {

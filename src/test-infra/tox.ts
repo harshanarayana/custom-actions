@@ -1,4 +1,4 @@
-import {TestInfra} from '../install/test-infra'
+import {TestInfra} from '../core/test-infra'
 import * as glob from '@actions/glob'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
