@@ -18,22 +18,18 @@ function defaultStdOutLineCallback(): (data: string) => void {
 
 function defaultStdErrLineCallback(): (data: string) => void {
     return (data: string) => {
-        core.info(data)
+        core.error(data)
     }
 }
 
 function defaultStdOutCallback(): (data: Buffer) => void {
     return (data: Buffer) => {
-        // eslint-disable-next-line no-console
-        console.log(data.toString().trim())
         core.info(data.toString().trim())
     }
 }
 
 function defaultStdErrCallback(): (data: Buffer) => void {
     return (data: Buffer) => {
-        // eslint-disable-next-line no-console
-        console.log(data.toString().trim())
         core.error(data.toString().trim())
     }
 }
@@ -48,7 +44,7 @@ function createExecOpts(
     errLineCallback: ((data: string) => void) | null
 ): ExecOptions {
     const opts: ExecOptions = {
-        silent
+        silent: true
     }
     if (bufferMode) {
         opts.listeners = {

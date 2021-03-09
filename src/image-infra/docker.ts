@@ -58,7 +58,7 @@ class DockerInfra implements ImageInfra {
                     '-t',
                     `${this.imageBaseName}:${tag}`
                 ],
-                true,
+                false,
                 null,
                 null
             )

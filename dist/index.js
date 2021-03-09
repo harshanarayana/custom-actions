@@ -476,7 +476,7 @@ class DockerInfra {
                     `${this.dockerFilePath}/Dockerfile-${this.imageSuffix}`,
                     '-t',
                     `${this.imageBaseName}:${tag}`
-                ], true, null, null);
+                ], false, null, null);
                 if (buildState !== 0) {
                     throw new Error(`Failed to build docker image for ${this.imageBaseName}:${tag}`);
                 }
@@ -1110,26 +1110,22 @@ function defaultStdOutLineCallback() {
 }
 function defaultStdErrLineCallback() {
     return (data) => {
-        core.info(data);
+        core.error(data);
     };
 }
 function defaultStdOutCallback() {
     return (data) => {
-        // eslint-disable-next-line no-console
-        console.log(data.toString().trim());
         core.info(data.toString().trim());
     };
 }
 function defaultStdErrCallback() {
     return (data) => {
-        // eslint-disable-next-line no-console
-        console.log(data.toString().trim());
         core.error(data.toString().trim());
     };
 }
 function createExecOpts(bufferMode, silent, env, stdoutCallback, stderrCallback, stdLineCallback, errLineCallback) {
     const opts = {
-        silent
+        silent: true
     };
     if (bufferMode) {
         opts.listeners = {
