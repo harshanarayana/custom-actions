@@ -6,14 +6,22 @@ inputs:
     required: false
     description: 'Kind of Operation Being Performed using the Actions. Tests/Docs/SanityCheck/Analysis'
     default: 'tests'
-  tox-env:
+  text-infra-tool:
     required: false
-    description: 'Name fo the Tox Environment to Run'
-    default: 'py37'
-  tox-version:
+    description: 'Name of the Test Management Infrastructure. Defaults to Tox'
+    default: 'tox'
+  test-infra-version:
     required: false
-    description: 'Version of the Tox to use for Running Tests'
+    description: 'Version of the Test Management infrastructure'
     default: 'latest'
+  additional-test-args:
+    required: false
+    description: 'Additional Arguments to be passed onto the Test Infra'
+    default: ''
+  force-test-tool-install:
+    required: false
+    description: 'Force Install the Test tool even if the Env does not need it'
+    default: "false"
   python-version:
     required: true
     description: "Version range or exact version of a Python version to use, using SemVer's version range syntax."
@@ -28,8 +36,8 @@ inputs:
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."
-  tox-version:
-    description: 'Currently installed version of the Tox Package'
+  test-infra-version:
+    description: 'Currently installed version of the Test Infra Package'
 runs:
   using: 'node12'
   main: 'dist/index.js'
