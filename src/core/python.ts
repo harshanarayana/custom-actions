@@ -10,7 +10,11 @@ interface InstalledVersion {
     version: string
 }
 
-export async function setupPythonInfra(): Promise<InstalledVersion> {
+export async function setupPythonInfra(): Promise<InstalledVersion | void> {
+    if (core.getInput('ignore-python-setup') === 'true') {
+        core.info('Ignoring setting up python Environment as it was configured by the Build context')
+        return Promise.resolve(undefined)
+    }
     const version = core.getInput('python-version')
     const arch = os.arch()
     const pipVersion = core.getInput('pip-version')

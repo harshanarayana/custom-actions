@@ -34,3 +34,4 @@ jobs:
           dockerfile-base-dir: './docker'
           docker-image-suffix: ${{ matrix.docker-image-suffix }}
           action: 'image-publish'
+          ignore-python-setup: 'true'

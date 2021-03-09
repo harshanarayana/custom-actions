@@ -116,6 +116,10 @@ inputs:
     required: false
     description: 'Tool chain to use for building docker images'
     default: 'docker'
+  ignore-python-setup:
+    required: false
+    description: 'Ignore Setting up Python infra if you are running just docker builds'
+    default: 'false'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."

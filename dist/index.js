@@ -320,6 +320,10 @@ const comon_1 = __webpack_require__(6745);
 const build_1 = __webpack_require__(9300);
 function setupPythonInfra() {
     return __awaiter(this, void 0, void 0, function* () {
+        if (core.getInput('ignore-python-setup') === 'true') {
+            core.info('Ignoring setting up python Environment as it was configured by the Build context');
+            return Promise.resolve(undefined);
+        }
         const version = core.getInput('python-version');
         const arch = os_1.default.arch();
         const pipVersion = core.getInput('pip-version');
