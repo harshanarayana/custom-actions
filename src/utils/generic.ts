@@ -80,7 +80,7 @@ export async function commandRunnerWithEnv(
     stderrCallback: ((data: Buffer) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(true, silent, env, stdoutCallback, stderrCallback, null, null)
-    return exec.exec(cmd, args, opts)
+    return await exec.exec(cmd, args, opts)
 }
 
 export async function commandRunner(
@@ -91,7 +91,7 @@ export async function commandRunner(
     stderrCallback: ((data: Buffer) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(true, silent, new Map<string, string>(), stdoutCallback, stderrCallback, null, null)
-    return exec.exec(cmd, args, opts)
+    return await exec.exec(cmd, args, opts)
 }
 
 export async function commandRunnerWithLineCallback(
@@ -103,5 +103,5 @@ export async function commandRunnerWithLineCallback(
     errLineCallback: ((data: string) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(false, silent, env, null, null, stdLineCallback, errLineCallback)
-    return exec.exec(cmd, args, opts)
+    return await exec.exec(cmd, args, opts)
 }

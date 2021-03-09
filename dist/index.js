@@ -1153,21 +1153,21 @@ function createExecOpts(bufferMode, silent, env, stdoutCallback, stderrCallback,
 function commandRunnerWithEnv(cmd, args, silent, env, stdoutCallback, stderrCallback) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = createExecOpts(true, silent, env, stdoutCallback, stderrCallback, null, null);
-        return exec.exec(cmd, args, opts);
+        return yield exec.exec(cmd, args, opts);
     });
 }
 exports.commandRunnerWithEnv = commandRunnerWithEnv;
 function commandRunner(cmd, args, silent, stdoutCallback, stderrCallback) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = createExecOpts(true, silent, new Map(), stdoutCallback, stderrCallback, null, null);
-        return exec.exec(cmd, args, opts);
+        return yield exec.exec(cmd, args, opts);
     });
 }
 exports.commandRunner = commandRunner;
 function commandRunnerWithLineCallback(cmd, args, silent, env, stdLineCallback, errLineCallback) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = createExecOpts(false, silent, env, null, null, stdLineCallback, errLineCallback);
-        return exec.exec(cmd, args, opts);
+        return yield exec.exec(cmd, args, opts);
     });
 }
 exports.commandRunnerWithLineCallback = commandRunnerWithLineCallback;
