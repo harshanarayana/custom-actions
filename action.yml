@@ -133,6 +133,8 @@ outputs:
     description: 'Package Deployment Infra Version'
   image-infra-version:
     description: 'Version of the Infra used to build the docker images'
+  image-infra-generated-list:
+    description: 'List of Docker images in the infra after the generation was done'
 runs:
   using: 'node12'
   main: 'dist/index.js'

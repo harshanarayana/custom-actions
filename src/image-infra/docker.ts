@@ -68,6 +68,7 @@ class DockerInfra implements ImageInfra {
                 throw new Error(`Failed to build docker image for ${this.imageBaseName}:${tag}`)
             }
         }
+        await this.setImageInfoOutput()
     }
 
     async installRequired(): Promise<boolean> {
@@ -106,6 +107,16 @@ class DockerInfra implements ImageInfra {
                 throw new Error(`Failed to push Docker Image ${this.imageBaseName}:${tag} to Registry`)
             }
         }
+    }
+
+    async setImageInfoOutput(): Promise<number> {
+        let totalInfo = ''
+        const callback = (data: Buffer): void => {
+            totalInfo += data.toString().trim()
+        }
+        await commandRunner('docker', ['images'], false, callback, callback)
+        core.setOutput('image-infra-generated-list', totalInfo)
+        return 0
     }
 
     async setVersion(): Promise<number> {

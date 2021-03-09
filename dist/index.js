@@ -496,6 +496,7 @@ class DockerInfra {
                     throw new Error(`Failed to build docker image for ${this.imageBaseName}:${tag}`);
                 }
             }
+            yield this.setImageInfoOutput();
         });
     }
     installRequired() {
@@ -529,6 +530,17 @@ class DockerInfra {
                     throw new Error(`Failed to push Docker Image ${this.imageBaseName}:${tag} to Registry`);
                 }
             }
+        });
+    }
+    setImageInfoOutput() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let totalInfo = '';
+            const callback = (data) => {
+                totalInfo += data.toString().trim();
+            };
+            yield generic_1.commandRunner('docker', ['images'], false, callback, callback);
+            core.setOutput('image-infra-generated-list', totalInfo);
+            return 0;
         });
     }
     setVersion() {

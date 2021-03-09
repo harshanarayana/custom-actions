@@ -37,3 +37,4 @@ jobs:
           action: 'image-publish'
           ignore-python-setup: 'true'
       - run: echo "output set by ${{ steps.build-image.outputs.image-infra-version }}"
+      - run: echo "output set by ${{ steps.build-image.outputs.image-infra-generated-list }}"
