@@ -2,6 +2,119 @@ require('./sourcemap-register.js');module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 6745:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.installPythonPackage = void 0;
+const core = __importStar(__webpack_require__(2186));
+const exec = __importStar(__webpack_require__(1514));
+function installPythonPackage(infra) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!(yield infra.installRequired())) {
+            core.info(`Package install check returned a false. Ignoring the setup of the test infra`);
+            return 0;
+        }
+        else {
+            const options = {
+                silent: true,
+                listeners: {
+                    stdout: (data) => {
+                        core.info(data.toString().trim());
+                    },
+                    stderr: (data) => {
+                        core.error(data.toString().trim());
+                    }
+                }
+            };
+            let state;
+            if (infra.version.startsWith('latest')) {
+                state = yield exec.exec('pip', ['install', '--upgrade', infra.name], options);
+            }
+            else {
+                state = yield exec.exec('pip', ['install', '--upgrade', `${infra.name}==${infra.version}`], options);
+            }
+            if (state !== 0) {
+                throw new Error(`Error setting up ${infra.name} installation for version ${infra.version}`);
+            }
+            yield infra.setVersion();
+            return state;
+        }
+    });
+}
+exports.installPythonPackage = installPythonPackage;
+
+
+/***/ }),
+
+/***/ 8986:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.runLinter = void 0;
+const black_1 = __webpack_require__(7837);
+const comon_1 = __webpack_require__(6745);
+function runLinter(lintInfraName, lintInfraVersion, force, additionalArgs) {
+    return __awaiter(this, void 0, void 0, function* () {
+        switch (lintInfraName.toLowerCase()) {
+            case 'black': {
+                const infra = black_1.getBlackInfra(lintInfraVersion, force, additionalArgs);
+                yield comon_1.installPythonPackage(infra);
+                yield infra.setVersion();
+                return yield infra.runLinter();
+            }
+            default: {
+                throw new Error(`Invalid Linter Infra with Name ${lintInfraName} and version ${lintInfraVersion}`);
+            }
+        }
+    });
+}
+exports.runLinter = runLinter;
+
+
+/***/ }),
+
 /***/ 8903:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -57,6 +170,44 @@ exports.setupPythonInfra = setupPythonInfra;
 
 "use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.runTests = void 0;
+const tox_1 = __webpack_require__(6333);
+const comon_1 = __webpack_require__(6745);
+function runTests(testInfraName, testInfraVersion, force, additionalArgs) {
+    return __awaiter(this, void 0, void 0, function* () {
+        switch (testInfraName.toLowerCase()) {
+            case 'tox': {
+                const infra = tox_1.getToxInfra(testInfraVersion, force, additionalArgs);
+                yield comon_1.installPythonPackage(infra);
+                yield infra.setVersion();
+                return yield infra.runTests();
+            }
+            default: {
+                throw new Error(`Invalid Test Infra with Name ${testInfraName} and version ${testInfraVersion}`);
+            }
+        }
+    });
+}
+exports.runTests = runTests;
+
+
+/***/ }),
+
+/***/ 7837:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -86,59 +237,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.runTests = void 0;
+exports.getBlackInfra = void 0;
 const core = __importStar(__webpack_require__(2186));
-const exec = __importStar(__webpack_require__(1514));
-const tox_1 = __webpack_require__(6333);
-function installTestInfra(infra) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!(yield infra.installRequired())) {
-            core.info(`Test infra install check returned a false. Ignoring the setup of the test infra`);
-            return 0;
-        }
-        else {
-            const options = {
-                silent: true,
-                listeners: {
-                    stdout: (data) => {
-                        core.info(data.toString().trim());
-                    },
-                    stderr: (data) => {
-                        core.error(data.toString().trim());
-                    }
-                }
-            };
-            let state;
-            if (infra.version.startsWith('latest')) {
-                state = yield exec.exec('pip', ['install', '--upgrade', infra.name], options);
-            }
-            else {
-                state = yield exec.exec('pip', ['install', '--upgrade', `${infra.name}==${infra.version}`], options);
-            }
-            if (state !== 0) {
-                throw new Error(`Error setting up ${infra.name} installation for version ${infra.version}`);
-            }
-            yield infra.setVersion();
-            return state;
-        }
-    });
+const generic_1 = __webpack_require__(1971);
+class BlackInfra {
+    constructor(version, force, additionalArg) {
+        this.argMap = new Map();
+        this.name = 'black';
+        this.version = version;
+        this.force = force;
+        this.additionalArgs = additionalArg;
+        this.argMap = generic_1.argToMap(additionalArg);
+    }
+    installRequired() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return true;
+        });
+    }
+    runLinter() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield generic_1.commandRunner('black', [], true, null, null);
+        });
+    }
+    setVersion() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield generic_1.commandRunner('black', ['--version'], true, (data) => {
+                core.setOutput('linter-infra-version', data.toString().trim());
+            }, null);
+        });
+    }
 }
-function runTests(testInfraName, testInfraVersion, force, additionalArgs) {
-    return __awaiter(this, void 0, void 0, function* () {
-        switch (testInfraName.toLowerCase()) {
-            case 'tox': {
-                const infra = tox_1.getToxInfra(testInfraVersion, force, additionalArgs);
-                yield installTestInfra(infra);
-                yield infra.setVersion();
-                return yield infra.runTests();
-            }
-            default: {
-                throw new Error(`Invalid Test Infra with Name ${testInfraName} and version ${testInfraVersion}`);
-            }
-        }
-    });
+function getBlackInfra(version, force, additionalArgs) {
+    return new BlackInfra(version, force, additionalArgs);
 }
-exports.runTests = runTests;
+exports.getBlackInfra = getBlackInfra;
 
 
 /***/ }),
@@ -185,16 +317,23 @@ const os_1 = __importDefault(__webpack_require__(2087));
 const path_1 = __importDefault(__webpack_require__(5622));
 const python_1 = __webpack_require__(8903);
 const test_infra_1 = __webpack_require__(4340);
+const lint_infra_1 = __webpack_require__(8986);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const action = core.getInput('action');
-            const testToolName = core.getInput('text-infra-tool');
+            // Base Python Infra
+            const version = core.getInput('python-version');
+            const arch = core.getInput('architecture') || os_1.default.arch();
+            // Test Tool Version
+            const testToolName = core.getInput('test-infra-tool');
             const testToolVersion = core.getInput('test-infra-version');
             const additionalTestArgs = core.getInput('additional-test-args');
             const force = core.getInput('force-test-tool-install').toLowerCase() === 'true';
-            const version = core.getInput('python-version');
-            const arch = core.getInput('architecture') || os_1.default.arch();
+            // linter tool config
+            const linterToolName = core.getInput('linter-infra-tool');
+            const linterToolVersion = core.getInput('linter-infra-version');
+            const additionalLinterArgs = core.getInput('additional-linter-args');
             yield python_1.setupPythonInfra(version, arch);
             const matchersPath = path_1.default.join(__dirname, '..', '.github');
             core.info(`##[add-matcher]${path_1.default.join(matchersPath, 'python.json')}`);
@@ -202,6 +341,10 @@ function run() {
                 case 'tests':
                 case 'test':
                     yield test_infra_1.runTests(testToolName, testToolVersion, force, additionalTestArgs);
+                    break;
+                case 'lint':
+                case 'linter':
+                    yield lint_infra_1.runLinter(linterToolName, linterToolVersion, true, additionalLinterArgs);
                     break;
                 default:
                     core.info(`Plugin action ${action} is a non supported entity`);
@@ -268,8 +411,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getToxInfra = void 0;
 const glob = __importStar(__webpack_require__(8090));
 const core = __importStar(__webpack_require__(2186));
-const exec = __importStar(__webpack_require__(1514));
 const common_1 = __webpack_require__(2243);
+const generic_1 = __webpack_require__(1971);
 class ToxInfra {
     constructor(version, force, additionalArg) {
         this.argMap = new Map();
@@ -277,11 +420,13 @@ class ToxInfra {
         this.version = version;
         this.force = force;
         this.additionalArgs = additionalArg;
-        this.argToMap();
+        this.argMap = generic_1.argToMap(additionalArg);
     }
     isToxEnv() {
         return __awaiter(this, void 0, void 0, function* () {
-            const g = yield glob.create(['**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join('\n'), { followSymbolicLinks: false });
+            const g = yield glob.create(['**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join('\n'), {
+                followSymbolicLinks: false
+            });
             const files = yield g.glob();
             return files.length >= 1;
         });
@@ -293,14 +438,6 @@ class ToxInfra {
             }
             return yield this.isToxEnv();
         });
-    }
-    argToMap() {
-        const argArray = this.additionalArgs
-            .split(/\s*,\s*/)
-            .map(part => part.split('='));
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        this.argMap = new Map(argArray);
     }
     envName() {
         const e = this.argMap.get('-e');
@@ -316,20 +453,17 @@ class ToxInfra {
                 return common_1.NonToxRepo;
             }
             const output = [];
-            const opts = {
-                silent: true,
-                listeners: {
-                    stdout: (data) => {
-                        const bData = data.toString().trim();
-                        core.info(bData);
-                        output.push(...bData.split('\n'));
-                    },
-                    stderr: (data) => {
-                        core.error(data.toString().trim());
-                    }
-                }
-            };
-            yield exec.exec('tox', ['-l'], opts);
+            yield generic_1.commandRunner('tox', ['-l'], true, 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            (function (out) {
+                return (data) => {
+                    const bData = data.toString().trim();
+                    core.info(bData);
+                    out.push(...bData.split('\n'));
+                };
+            })(output), (data) => {
+                core.error(data.toString().trim());
+            });
             const filteredData = output.filter(line => {
                 return line === this.envName();
             });
@@ -359,18 +493,11 @@ class ToxInfra {
                 }
                 additionalArg.push(...['-e', this.envName()]);
             }
-            const options = {
-                silent: true,
-                listeners: {
-                    stdout: (data) => {
-                        core.info(data.toString().trim());
-                    },
-                    stderr: (data) => {
-                        core.error(data.toString().trim());
-                    }
-                }
-            };
-            const state = yield exec.exec('tox', additionalArg, options);
+            const state = yield generic_1.commandRunner('tox', additionalArg, true, (data) => {
+                core.info(data.toString().trim());
+            }, (data) => {
+                core.error(data.toString().trim());
+            });
             if (state !== 0) {
                 throw new Error(`Tox Environment ${this.envName()} run completed with an exit code ${state}`);
             }
@@ -383,18 +510,11 @@ class ToxInfra {
                 core.setOutput('test-infra-version', 'na');
                 return 0;
             }
-            const options = {
-                silent: true,
-                listeners: {
-                    stdout: (data) => {
-                        core.setOutput('test-infra-version', data.toString().trim());
-                    },
-                    stderr: (data) => {
-                        core.error(data.toString().trim());
-                    }
-                }
-            };
-            return yield exec.exec('tox', ['--version'], options);
+            return yield generic_1.commandRunner('tox', ['--version'], true, (data) => {
+                core.setOutput('test-infra-version', data.toString().trim());
+            }, (data) => {
+                core.error(data.toString().trim());
+            });
         });
     }
 }
@@ -402,6 +522,77 @@ function getToxInfra(version, force, additionalArgs) {
     return new ToxInfra(version, force, additionalArgs);
 }
 exports.getToxInfra = getToxInfra;
+
+
+/***/ }),
+
+/***/ 1971:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.commandRunner = exports.argToMap = void 0;
+const exec = __importStar(__webpack_require__(1514));
+const core = __importStar(__webpack_require__(2186));
+function argToMap(additionalArgs) {
+    const argArray = additionalArgs.split(/\s*,\s*/).map(part => part.split('='));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return new Map(argArray);
+}
+exports.argToMap = argToMap;
+function defaultStdOutCallback() {
+    return (data) => {
+        core.info(data.toString().trim());
+    };
+}
+function defaultStdErrCallback() {
+    return (data) => {
+        core.error(data.toString().trim());
+    };
+}
+function commandRunner(cmd, args, silent, stdoutCallback, stderrCallback) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const opts = {
+            silent,
+            listeners: {
+                stdout: stderrCallback || defaultStdOutCallback,
+                stderr: stderrCallback || defaultStdErrCallback
+            }
+        };
+        return yield exec.exec(cmd, args, opts);
+    });
+}
+exports.commandRunner = commandRunner;
 
 
 /***/ }),

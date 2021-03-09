@@ -6,7 +6,7 @@ inputs:
     required: false
     description: 'Kind of Operation Being Performed using the Actions. Tests/Docs/SanityCheck/Analysis'
     default: 'tests'
-  text-infra-tool:
+  test-infra-tool:
     required: false
     description: 'Name of the Test Management Infrastructure. Defaults to Tox'
     default: 'tox'
@@ -22,6 +22,18 @@ inputs:
     required: false
     description: 'Force Install the Test tool even if the Env does not need it'
     default: "false"
+  linter-infra-tool:
+    required: false
+    description: 'Tool used to perming linting operation on the repository'
+    default: 'black'
+  linter-infra-version:
+    required: false
+    description: 'Install a specific version of linter tool chain as required'
+    default: 'latest'
+  additional-linter-args:
+    required: false
+    description: 'Additional Override argument to be passed to the Linter'
+    default: ''
   python-version:
     required: true
     description: "Version range or exact version of a Python version to use, using SemVer's version range syntax."
@@ -38,6 +50,8 @@ outputs:
     description: "The installed python version. Useful when given a version range as input."
   test-infra-version:
     description: 'Currently installed version of the Test Infra Package'
+  linter-infra-version:
+    description: 'Version of the Linter tool configured'
 runs:
   using: 'node12'
   main: 'dist/index.js'
