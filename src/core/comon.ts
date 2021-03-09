@@ -48,6 +48,27 @@ export async function buildWheelFiles(): Promise<number> {
     )
 }
 
+export async function setToolVersionWithCustomCommand(
+    outputName: string,
+    cmd: string,
+    infra: BaseInfra
+): Promise<number> {
+    let info = ''
+    const state = await commandRunner(
+        infra.name,
+        [cmd],
+        true,
+        data => {
+            info += data.toString().trim()
+        },
+        data => {
+            info += data.toString().trim()
+        }
+    )
+    core.setOutput(outputName, info)
+    return Promise.resolve(state)
+}
+
 export async function setToolVersion(outputName: string, infra: BaseInfra): Promise<number> {
     return commandRunner(
         infra.name,

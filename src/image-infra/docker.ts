@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {ImageInfra} from '../types/types'
-import {setToolVersion} from '../core/comon'
+import {setToolVersionWithCustomCommand} from '../core/comon'
 import * as g from 'git-repo-info'
 import gitRepoInfo from 'git-repo-info'
 import {commandRunner} from '../utils/generic'
@@ -109,7 +109,7 @@ class DockerInfra implements ImageInfra {
     }
 
     async setVersion(): Promise<number> {
-        return setToolVersion('image-infra-version', this)
+        return setToolVersionWithCustomCommand('image-infra-version', 'version', this)
     }
 
     async setup(): Promise<void> {

@@ -36,7 +36,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setToolVersion = exports.buildWheelFiles = exports.installPythonPackage = void 0;
+exports.setToolVersion = exports.setToolVersionWithCustomCommand = exports.buildWheelFiles = exports.installPythonPackage = void 0;
 const core = __importStar(__webpack_require__(2186));
 const exec = __importStar(__webpack_require__(1514));
 const generic_1 = __webpack_require__(1971);
@@ -84,6 +84,19 @@ function buildWheelFiles() {
     });
 }
 exports.buildWheelFiles = buildWheelFiles;
+function setToolVersionWithCustomCommand(outputName, cmd, infra) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let info = '';
+        const state = yield generic_1.commandRunner(infra.name, [cmd], true, data => {
+            info += data.toString().trim();
+        }, data => {
+            info += data.toString().trim();
+        });
+        core.setOutput(outputName, info);
+        return Promise.resolve(state);
+    });
+}
+exports.setToolVersionWithCustomCommand = setToolVersionWithCustomCommand;
 function setToolVersion(outputName, infra) {
     return __awaiter(this, void 0, void 0, function* () {
         return generic_1.commandRunner(infra.name, ['--version'], true, data => {
@@ -520,7 +533,7 @@ class DockerInfra {
     }
     setVersion() {
         return __awaiter(this, void 0, void 0, function* () {
-            return comon_1.setToolVersion('image-infra-version', this);
+            return comon_1.setToolVersionWithCustomCommand('image-infra-version', 'version', this);
         });
     }
     setup() {
