@@ -20,10 +20,16 @@ class ToxInfra implements TestInfra {
     }
 
     async isToxEnv(): Promise<boolean> {
-        const g = await glob.create(['**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join('\n'), {
-            followSymbolicLinks: false
-        })
+        const g = await glob.create(
+            ['./tox.ini', './pyproject.toml', './setup.cfg', '**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join(
+                '\n'
+            ),
+            {
+                followSymbolicLinks: false
+            }
+        )
         const files = await g.glob()
+        core.info(`Found Matching files are ${files}`)
         return files.length >= 1
     }
 

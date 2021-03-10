@@ -1097,10 +1097,7 @@ class PyspellingInfra {
     }
     isSpellCheckEnv() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (core.getInput('spellcheck-force') === 'true') {
-                return Promise.resolve(true);
-            }
-            const pattern = ['**/.pyspelling.yml'];
+            const pattern = ['**/.pyspelling.yml', './.pyspelling.yml'];
             const cfgFile = this.argMap.get('-c') || this.argMap.get('--config');
             if (cfgFile !== undefined && cfgFile.length > 0) {
                 pattern.push(`**/${cfgFile}`);
@@ -1109,6 +1106,10 @@ class PyspellingInfra {
                 followSymbolicLinks: false
             });
             const files = yield g.glob();
+            core.info(`Found Matching files are ${files}`);
+            if (core.getInput('spellcheck-force') === 'true') {
+                return Promise.resolve(true);
+            }
             return files.length >= 1;
         });
     }
@@ -1190,10 +1191,11 @@ class ToxInfra {
     }
     isToxEnv() {
         return __awaiter(this, void 0, void 0, function* () {
-            const g = yield glob.create(['**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join('\n'), {
+            const g = yield glob.create(['./tox.ini', './pyproject.toml', './setup.cfg', '**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join('\n'), {
                 followSymbolicLinks: false
             });
             const files = yield g.glob();
+            core.info(`Found Matching files are ${files}`);
             return files.length >= 1;
         });
     }

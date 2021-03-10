@@ -71,10 +71,7 @@ class PyspellingInfra implements SpellCheckInfra {
     }
 
     async isSpellCheckEnv(): Promise<boolean> {
-        if (core.getInput('spellcheck-force') === 'true') {
-            return Promise.resolve(true)
-        }
-        const pattern: string[] = ['**/.pyspelling.yml']
+        const pattern: string[] = ['**/.pyspelling.yml', './.pyspelling.yml']
 
         const cfgFile = this.argMap.get('-c') || this.argMap.get('--config')
         if (cfgFile !== undefined && cfgFile.length > 0) {
@@ -84,6 +81,10 @@ class PyspellingInfra implements SpellCheckInfra {
             followSymbolicLinks: false
         })
         const files = await g.glob()
+        core.info(`Found Matching files are ${files}`)
+        if (core.getInput('spellcheck-force') === 'true') {
+            return Promise.resolve(true)
+        }
         return files.length >= 1
     }
 
