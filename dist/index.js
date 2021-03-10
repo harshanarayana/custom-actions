@@ -1450,11 +1450,11 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
         let cmdToLog = cmd;
         if (cmd === 'docker') {
             if (!args.includes('login')) {
-                cmdToLog += ` ${args}`;
+                cmdToLog += ` ${args.join(' ')}`;
             }
         }
         else {
-            cmdToLog += ` ${args}`;
+            cmdToLog += ` ${args.join(' ')}`;
         }
         core.info(`Running Base command: ${cmdToLog}`);
         try {

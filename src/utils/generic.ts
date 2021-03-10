@@ -160,10 +160,10 @@ export async function execaCommandRunner(
     let cmdToLog = cmd
     if (cmd === 'docker') {
         if (!args.includes('login')) {
-            cmdToLog += ` ${args}`
+            cmdToLog += ` ${args.join(' ')}`
         }
     } else {
-        cmdToLog += ` ${args}`
+        cmdToLog += ` ${args.join(' ')}`
     }
 
     core.info(`Running Base command: ${cmdToLog}`)
