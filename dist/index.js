@@ -355,6 +355,73 @@ exports.setupPythonInfra = setupPythonInfra;
 
 /***/ }),
 
+/***/ 9868:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.runSpellCheck = void 0;
+const core = __importStar(__webpack_require__(2186));
+const pyspelling_1 = __webpack_require__(1434);
+const comon_1 = __webpack_require__(6745);
+function runSpellCheck() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const name = core.getInput('spellcheck-infra-name');
+        const version = core.getInput('spellcheck-infra-version');
+        switch (name.toLowerCase()) {
+            case 'pyspelling': {
+                const infra = pyspelling_1.getPySpellingInfra(version, true, core.getInput('spellcheck-additional-args'));
+                const required = yield infra.installRequired();
+                if (required) {
+                    yield infra.setupPreRequisites();
+                    yield comon_1.installPythonPackage(infra);
+                    yield infra.findItAll();
+                }
+                else {
+                    core.info('No installation of the Spell check infra requires as no matching configuration found');
+                }
+                return Promise.resolve(undefined);
+            }
+            default: {
+                throw new Error(`No spell check infra with name ${name} and version ${version} is supported`);
+            }
+        }
+    });
+}
+exports.runSpellCheck = runSpellCheck;
+
+
+/***/ }),
+
 /***/ 4340:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -657,6 +724,7 @@ const test_infra_1 = __webpack_require__(4340);
 const lint_infra_1 = __webpack_require__(8986);
 const package_infra_1 = __webpack_require__(322);
 const image_infra_1 = __webpack_require__(5999);
+const spell_infra_1 = __webpack_require__(9868);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -682,6 +750,10 @@ function run() {
                 case 'docker-build':
                 case 'docker-image':
                     yield image_infra_1.runImageBuilder();
+                    break;
+                case 'spellcheck':
+                case 'typo':
+                    yield spell_infra_1.runSpellCheck();
                     break;
                 default:
                     core.info(`Plugin action ${action} is a non supported entity`);
@@ -916,6 +988,124 @@ function getTwineInfra(version, force, additionalArg, pypiUser, pypiPassword, py
     return new TwineInfra(version, force, additionalArg, pypiUser, pypiPassword, pypiAccessToken, packageDir, verifyMetadata, skipExisting);
 }
 exports.getTwineInfra = getTwineInfra;
+
+
+/***/ }),
+
+/***/ 1434:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPySpellingInfra = void 0;
+const generic_1 = __webpack_require__(1971);
+const core = __importStar(__webpack_require__(2186));
+const glob = __importStar(__webpack_require__(8090));
+const comon_1 = __webpack_require__(6745);
+class PyspellingInfra {
+    constructor(version, force, additionalArg) {
+        this.argMap = new Map();
+        this.name = 'pyspelling';
+        this.version = version;
+        this.force = force;
+        this.additionalArgs = additionalArg;
+        this.argMap = generic_1.argToMap(additionalArg);
+    }
+    findItAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!(yield this.requiredToRun())) {
+                core.info('Skipping the Spell check as there is no configuration files provided to run');
+                return Promise.resolve(0);
+            }
+            const cfgFile = this.argMap.get('-c') || this.argMap.get('--config');
+            const args = [];
+            if (cfgFile !== undefined && cfgFile.length > 0) {
+                args.push(...['--config', cfgFile]);
+            }
+            const state = yield generic_1.commandRunner('pyspelling', args, true, null, null);
+            if (state !== 0) {
+                throw new Error('Spell Check failed. Please check the logs to find out the error details');
+            }
+            return Promise.resolve(0);
+        });
+    }
+    installRequired() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.isSpellCheckEnv();
+        });
+    }
+    setVersion() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield comon_1.setToolVersion('spellcheck-infra-version', this);
+        });
+    }
+    setupPreRequisites() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const arg of [
+                ['apt-get', 'update', '-y'],
+                ['apt-get', 'install', 'aspell', 'aspell-en', '-y']
+            ]) {
+                const state = yield generic_1.commandRunner('sudo', arg, true, null, null);
+                if (state !== 0) {
+                    throw new Error(`Failed to Run command ${arg}`);
+                }
+            }
+            return Promise.resolve(0);
+        });
+    }
+    isSpellCheckEnv() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const pattern = ['**/.pyspelling.yml'];
+            const cfgFile = this.argMap.get('-c') || this.argMap.get('--config');
+            if (cfgFile !== undefined && cfgFile.length > 0) {
+                pattern.push(`**/${cfgFile}`);
+            }
+            const g = yield glob.create(pattern.join('\n'), {
+                followSymbolicLinks: false
+            });
+            const files = yield g.glob();
+            return files.length >= 1;
+        });
+    }
+    requiredToRun() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.resolve(yield this.isSpellCheckEnv());
+        });
+    }
+}
+function getPySpellingInfra(version, force, additionalArgs) {
+    return new PyspellingInfra(version, force, additionalArgs);
+}
+exports.getPySpellingInfra = getPySpellingInfra;
 
 
 /***/ }),

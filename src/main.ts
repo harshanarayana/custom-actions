@@ -6,6 +6,7 @@ import {runTests} from './core/test-infra'
 import {runLinter} from './core/lint-infra'
 import {runPackagePublish} from './core/package-infra'
 import {runImageBuilder} from './core/image-infra'
+import {runSpellCheck} from './core/spell-infra'
 
 async function run(): Promise<void> {
     try {
@@ -31,6 +32,10 @@ async function run(): Promise<void> {
             case 'docker-build':
             case 'docker-image':
                 await runImageBuilder()
+                break
+            case 'spellcheck':
+            case 'typo':
+                await runSpellCheck()
                 break
             default:
                 core.info(`Plugin action ${action} is a non supported entity`)

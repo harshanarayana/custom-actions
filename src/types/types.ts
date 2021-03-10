@@ -50,3 +50,12 @@ export interface ImageInfra extends BaseInfra {
     login(): Promise<void>
     pushImage(): Promise<void>
 }
+
+export interface ConditionalRunnerInfra extends BaseInfra {
+    requiredToRun(): Promise<boolean>
+}
+
+export interface SpellCheckInfra extends ConditionalRunnerInfra {
+    setupPreRequisites(): Promise<number>
+    findItAll(): Promise<number>
+}
