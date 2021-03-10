@@ -1052,8 +1052,20 @@ class PyspellingInfra {
             if (cfgFile !== undefined && cfgFile.length > 0) {
                 args.push(...['--config', cfgFile]);
             }
-            const state = yield generic_1.commandRunner('pyspelling', args, true, null, null);
-            if (state !== 0 && !this.ignoreError) {
+            let failed = false;
+            try {
+                const state = yield generic_1.commandRunner('pyspelling', args, true, null, null);
+                if (state !== 0 && !this.ignoreError) {
+                    failed = true;
+                }
+            }
+            catch (e) {
+                core.info(`Spell check Command returned an error. The Ignore error is set to ${this.ignoreError}`);
+                if (!this.ignoreError) {
+                    failed = true;
+                }
+            }
+            if (failed) {
                 throw new Error('Spell Check failed. Please check the logs to find out the error details');
             }
             return Promise.resolve(0);
