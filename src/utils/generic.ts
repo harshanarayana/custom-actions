@@ -166,45 +166,29 @@ export async function execaCommandRunner(
         cmdToLog += ` ${args}`
     }
 
-    process.stdout.on('data', data => {
-        if (stdoutCallback !== null) {
-            stdoutCallback(data)
-        } else if (stdLineCallback !== null) {
-            stdLineCallback(data)
-        } else {
-            core.info(data)
-        }
-    })
-
-    process.stderr.on('data', data => {
-        if (stderrCallback !== null) {
-            stderrCallback(data)
-        } else if (errLineCallback !== null) {
-            errLineCallback(data)
-        } else {
-            core.error(data)
-        }
-    })
-
     core.info(`Running Base command: ${cmdToLog}`)
     try {
         const out = await execa(cmd, args, opts)
         core.info(`Command : ${cmdToLog} finished with ${out.exitCode}`)
-        // if (out.exitCode !== 0) {
-        //     if (stderrCallback !== null) {
-        //         stderrCallback(Buffer.from(out.stderr, 'utf-8'))
-        //     }
-        //     if (errLineCallback !== null) {
-        //         errLineCallback(out.stderr)
-        //     }
-        // } else {
-        //     if (stdoutCallback !== null) {
-        //         stdoutCallback(Buffer.from(out.stdout, 'utf-8'))
-        //     }
-        //     if (stdLineCallback !== null) {
-        //         stdLineCallback(out.stdout)
-        //     }
-        // }
+        if (out.exitCode !== 0) {
+            if (out.stderr !== undefined) {
+                if (stderrCallback !== null) {
+                    stderrCallback(Buffer.from(out.stderr, 'utf-8'))
+                }
+                if (errLineCallback !== null) {
+                    errLineCallback(out.stderr)
+                }
+            }
+        } else {
+            if (out.stdout !== undefined) {
+                if (stdoutCallback !== null) {
+                    stdoutCallback(Buffer.from(out.stdout, 'utf-8'))
+                }
+                if (stdLineCallback !== null) {
+                    stdLineCallback(out.stdout)
+                }
+            }
+        }
         return Promise.resolve(out.exitCode)
     } catch (e) {
         core.info(`cmd: ${cmdToLog} finished with ${e.stack}`)
