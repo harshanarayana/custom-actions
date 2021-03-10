@@ -10,6 +10,7 @@ class PyspellingInfra implements SpellCheckInfra {
     name: string
     version: string
     argMap: Map<string, string> = new Map<string, string>()
+    ignoreError: boolean
 
     constructor(version: string, force: boolean, additionalArg: string) {
         this.name = 'pyspelling'
@@ -17,6 +18,7 @@ class PyspellingInfra implements SpellCheckInfra {
         this.force = force
         this.additionalArgs = additionalArg
         this.argMap = argToMap(additionalArg)
+        this.ignoreError = core.getInput('spellcheck-ignore-errors') === 'true'
     }
 
     async findItAll(): Promise<number> {
@@ -30,7 +32,7 @@ class PyspellingInfra implements SpellCheckInfra {
             args.push(...['--config', cfgFile])
         }
         const state = await commandRunner('pyspelling', args, true, null, null)
-        if (state !== 0) {
+        if (state !== 0 && !this.ignoreError) {
             throw new Error('Spell Check failed. Please check the logs to find out the error details')
         }
         return Promise.resolve(0)

@@ -1039,6 +1039,7 @@ class PyspellingInfra {
         this.force = force;
         this.additionalArgs = additionalArg;
         this.argMap = generic_1.argToMap(additionalArg);
+        this.ignoreError = core.getInput('spellcheck-ignore-errors') === 'true';
     }
     findItAll() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1052,7 +1053,7 @@ class PyspellingInfra {
                 args.push(...['--config', cfgFile]);
             }
             const state = yield generic_1.commandRunner('pyspelling', args, true, null, null);
-            if (state !== 0) {
+            if (state !== 0 && !this.ignoreError) {
                 throw new Error('Spell Check failed. Please check the logs to find out the error details');
             }
             return Promise.resolve(0);

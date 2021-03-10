@@ -1,0 +1,7 @@
+matrix:
+  - name: Typescript Source Code
+    aspell:
+      lang: en
+      d: en_US
+    sources:
+      - '**/*.ts'

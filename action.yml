@@ -132,6 +132,10 @@ inputs:
     required: false
     description: 'Additional Argument to be passed for performing Spell check'
     default: ''
+  spellcheck-ignore-errors:
+    required: false
+    description: 'Ignore Spell Check errors and do not fail the task'
+    default: 'false'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."
