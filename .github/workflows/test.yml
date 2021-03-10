@@ -7,16 +7,7 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-   spell:
-     runs-on: ubuntu-latest
-     name: Spell Check Infra
-     steps:
-       - name: Setup Custom Actions
-         uses: harshanarayana/custom-actions@main
-         with:
-           action: 'spellcheck'
-           spellcheck-ignore-errors: 'true'
-  build: # make sure build/ci work properly
+  build:
     runs-on: ubuntu-latest
     name: Basic Build Test for the Repository
     steps:
@@ -59,3 +50,13 @@ jobs:
         name: Display Docker Tool Version
       - run: echo "output set by ${{ steps.build-image.outputs.image-infra-generated-list }}"
         name: Display Docker Images generated during Test
+  spell:
+    runs-on: ubuntu-latest
+    name: Spell Check Infra
+    steps:
+      - name: Setup Custom Actions
+        uses: harshanarayana/custom-actions@main
+        with:
+          action: 'spellcheck'
+          python-version: 3.9
+          spellcheck-ignore-errors: 'true'
