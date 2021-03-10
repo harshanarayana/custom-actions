@@ -180,6 +180,7 @@ export async function execaCommandRunner(
         core.info(`Command : ${cmdToLog} finished with ${out.exitCode}`)
         if (out.exitCode !== 0) {
             if (out.stderr !== undefined) {
+                core.error(out.stderr)
                 if (stderrCallback !== null) {
                     stderrCallback(Buffer.from(out.stderr, 'utf-8'))
                 }
@@ -189,6 +190,7 @@ export async function execaCommandRunner(
             }
         } else {
             if (out.stdout !== undefined) {
+                core.info(out.stdout)
                 if (stdoutCallback !== null) {
                     stdoutCallback(Buffer.from(out.stdout, 'utf-8'))
                 }
