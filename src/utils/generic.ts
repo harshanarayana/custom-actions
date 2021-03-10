@@ -148,13 +148,13 @@ export async function execaCommandRunner(
             process.env[key] = value
         })
     }
-    let stderr: execa.StdioOption = process.stderr
-    let stdout: execa.StdioOption | null = process.stdout
-    if (stderrCallback !== undefined || errLineCallback !== undefined) {
-        stderr = undefined
+    let stderr: execa.StdioOption = undefined
+    let stdout: execa.StdioOption = undefined
+    if (stderrCallback === undefined && errLineCallback === undefined) {
+        stderr = process.stderr
     }
-    if (stdoutCallback !== undefined || stdLineCallback !== undefined) {
-        stdout = undefined
+    if (stdoutCallback === undefined && stdLineCallback === undefined) {
+        stdout = process.stdout
     }
     const opts: execa.Options = {
         cleanup: true,

@@ -1439,13 +1439,13 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
                 process.env[key] = value;
             });
         }
-        let stderr = process.stderr;
-        let stdout = process.stdout;
-        if (stderrCallback !== undefined || errLineCallback !== undefined) {
-            stderr = undefined;
+        let stderr = undefined;
+        let stdout = undefined;
+        if (stderrCallback === undefined && errLineCallback === undefined) {
+            stderr = process.stderr;
         }
-        if (stdoutCallback !== undefined || stdLineCallback !== undefined) {
-            stdout = undefined;
+        if (stdoutCallback === undefined && stdLineCallback === undefined) {
+            stdout = process.stdout;
         }
         const opts = {
             cleanup: true,
