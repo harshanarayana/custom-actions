@@ -148,10 +148,18 @@ export async function execaCommandRunner(
             process.env[key] = value
         })
     }
+    let stderr: execa.StdioOption = process.stderr
+    let stdout: execa.StdioOption | null = process.stdout
+    if (stderrCallback !== undefined || errLineCallback !== undefined) {
+        stderr = undefined
+    }
+    if (stdoutCallback !== undefined || stdLineCallback !== undefined) {
+        stdout = undefined
+    }
     const opts: execa.Options = {
         cleanup: true,
-        stdout: process.stdout,
-        stderr: process.stderr,
+        stdout,
+        stderr,
         extendEnv: true,
         env: process.env,
         buffer: true
