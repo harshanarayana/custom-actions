@@ -100,6 +100,7 @@ exports.setToolVersionWithCustomCommand = setToolVersionWithCustomCommand;
 function setToolVersion(outputName, infra) {
     return __awaiter(this, void 0, void 0, function* () {
         return generic_1.commandRunner(infra.name, ['--version'], true, data => {
+            core.info('Fetching Version');
             core.setOutput(outputName, data.toString().trim());
         }, null);
     });
@@ -1332,6 +1333,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.execaCommandRunner = exports.commandRunnerWithLineCallback = exports.commandRunner = exports.commandRunnerWithEnv = exports.argToMap = void 0;
+const exec = __importStar(__webpack_require__(1514));
 const core = __importStar(__webpack_require__(2186));
 const execa_1 = __importDefault(__webpack_require__(5447));
 function argToMap(additionalArgs) {
@@ -1394,21 +1396,39 @@ function createExecOpts(bufferMode, silent, env, stdoutCallback, stderrCallback,
 function commandRunnerWithEnv(cmd, args, silent, env, stdoutCallback, stderrCallback) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = createExecOpts(true, silent, env, stdoutCallback, stderrCallback, null, null);
-        return yield execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, null, null);
+        const status = yield execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, null, null);
+        if (status === 237) {
+            return yield exec.exec(cmd, args, opts);
+        }
+        else {
+            return Promise.resolve(status);
+        }
     });
 }
 exports.commandRunnerWithEnv = commandRunnerWithEnv;
 function commandRunner(cmd, args, silent, stdoutCallback, stderrCallback) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = createExecOpts(true, silent, new Map(), stdoutCallback, stderrCallback, null, null);
-        return yield execaCommandRunner(cmd, args, new Map(), stdoutCallback, stderrCallback, null, null);
+        const status = yield execaCommandRunner(cmd, args, new Map(), stdoutCallback, stderrCallback, null, null);
+        if (status === 237) {
+            return yield exec.exec(cmd, args, opts);
+        }
+        else {
+            return Promise.resolve(status);
+        }
     });
 }
 exports.commandRunner = commandRunner;
 function commandRunnerWithLineCallback(cmd, args, silent, env, stdLineCallback, errLineCallback) {
     return __awaiter(this, void 0, void 0, function* () {
         const opts = createExecOpts(false, silent, env, null, null, stdLineCallback, errLineCallback);
-        return yield execaCommandRunner(cmd, args, env, null, null, stdLineCallback, errLineCallback);
+        const status = yield execaCommandRunner(cmd, args, env, null, null, stdLineCallback, errLineCallback);
+        if (status === 237) {
+            return yield exec.exec(cmd, args, opts);
+        }
+        else {
+            return Promise.resolve(status);
+        }
     });
 }
 exports.commandRunnerWithLineCallback = commandRunnerWithLineCallback;
@@ -1429,24 +1449,31 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
             buffer: true
         };
         core.info(`cmd: ${cmd}, args: ${args}, opts: ${opts}`);
-        const out = yield execa_1.default(cmd, args, opts);
-        if (out.exitCode !== 0) {
-            if (stderrCallback !== null) {
-                stderrCallback(Buffer.from(out.stderr));
+        try {
+            const out = yield execa_1.default(cmd, args, opts);
+            core.info(`cmd: ${cmd} finished with ${out.exitCode} ${out.stdout} ${out.stderr}`);
+            if (out.exitCode !== 0) {
+                if (stderrCallback !== null) {
+                    stderrCallback(Buffer.from(out.stderr));
+                }
+                if (errLineCallback !== null) {
+                    errLineCallback(out.stderr);
+                }
             }
-            if (errLineCallback !== null) {
-                errLineCallback(out.stderr);
+            else {
+                if (stdoutCallback !== null) {
+                    stdoutCallback(Buffer.from(out.stdout));
+                }
+                if (stdLineCallback !== null) {
+                    stdLineCallback(out.stdout);
+                }
             }
+            return Promise.resolve(out.exitCode);
         }
-        else {
-            if (stdoutCallback !== null) {
-                stdoutCallback(Buffer.from(out.stdout));
-            }
-            if (stdLineCallback !== null) {
-                stdLineCallback(out.stdout);
-            }
+        catch (e) {
+            core.info(`cmd: ${cmd} finished with ${e}`);
         }
-        return Promise.resolve(out.exitCode);
+        return Promise.resolve(237);
     });
 }
 exports.execaCommandRunner = execaCommandRunner;

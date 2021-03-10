@@ -75,6 +75,7 @@ export async function setToolVersion(outputName: string, infra: BaseInfra): Prom
         ['--version'],
         true,
         data => {
+            core.info('Fetching Version')
             core.setOutput(outputName, data.toString().trim())
         },
         null

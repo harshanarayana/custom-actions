@@ -84,7 +84,12 @@ export async function commandRunnerWithEnv(
     stderrCallback: ((data: Buffer) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(true, silent, env, stdoutCallback, stderrCallback, null, null)
-    return await execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, null, null)
+    const status = await execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, null, null)
+    if (status === 237) {
+        return await exec.exec(cmd, args, opts)
+    } else {
+        return Promise.resolve(status)
+    }
 }
 
 export async function commandRunner(
@@ -95,7 +100,20 @@ export async function commandRunner(
     stderrCallback: ((data: Buffer) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(true, silent, new Map<string, string>(), stdoutCallback, stderrCallback, null, null)
-    return await execaCommandRunner(cmd, args, new Map<string, string>(), stdoutCallback, stderrCallback, null, null)
+    const status = await execaCommandRunner(
+        cmd,
+        args,
+        new Map<string, string>(),
+        stdoutCallback,
+        stderrCallback,
+        null,
+        null
+    )
+    if (status === 237) {
+        return await exec.exec(cmd, args, opts)
+    } else {
+        return Promise.resolve(status)
+    }
 }
 
 export async function commandRunnerWithLineCallback(
@@ -107,7 +125,12 @@ export async function commandRunnerWithLineCallback(
     errLineCallback: ((data: string) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(false, silent, env, null, null, stdLineCallback, errLineCallback)
-    return await execaCommandRunner(cmd, args, env, null, null, stdLineCallback, errLineCallback)
+    const status = await execaCommandRunner(cmd, args, env, null, null, stdLineCallback, errLineCallback)
+    if (status === 237) {
+        return await exec.exec(cmd, args, opts)
+    } else {
+        return Promise.resolve(status)
+    }
 }
 
 export async function execaCommandRunner(
@@ -135,21 +158,27 @@ export async function execaCommandRunner(
     }
 
     core.info(`cmd: ${cmd}, args: ${args}, opts: ${opts}`)
-    const out = await execa(cmd, args, opts)
-    if (out.exitCode !== 0) {
-        if (stderrCallback !== null) {
-            stderrCallback(Buffer.from(out.stderr))
+    try {
+        const out = await execa(cmd, args, opts)
+        core.info(`cmd: ${cmd} finished with ${out.exitCode} ${out.stdout} ${out.stderr}`)
+        if (out.exitCode !== 0) {
+            if (stderrCallback !== null) {
+                stderrCallback(Buffer.from(out.stderr))
+            }
+            if (errLineCallback !== null) {
+                errLineCallback(out.stderr)
+            }
+        } else {
+            if (stdoutCallback !== null) {
+                stdoutCallback(Buffer.from(out.stdout))
+            }
+            if (stdLineCallback !== null) {
+                stdLineCallback(out.stdout)
+            }
         }
-        if (errLineCallback !== null) {
-            errLineCallback(out.stderr)
-        }
-    } else {
-        if (stdoutCallback !== null) {
-            stdoutCallback(Buffer.from(out.stdout))
-        }
-        if (stdLineCallback !== null) {
-            stdLineCallback(out.stdout)
-        }
+        return Promise.resolve(out.exitCode)
+    } catch (e) {
+        core.info(`cmd: ${cmd} finished with ${e}`)
     }
-    return Promise.resolve(out.exitCode)
+    return Promise.resolve(237)
 }
