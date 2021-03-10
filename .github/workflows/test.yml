@@ -7,53 +7,55 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    name: Basic Build Test for the Repository
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout the Repository
-      - run: |
-          npm install
-        name: Install NPM Packages
-      - run: |
-          npm run all
-        name: Run NPM Tasks
-  test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
-    name: Run Basic Actions from the Repo
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout the Repository
-      - uses: harshanarayana/custom-actions@main
-        name: Run Basic Python Infrastructure Setup Action
-        with:
-          python-version: 3.7
-  build-image:
-    runs-on: ubuntu-latest
-    name: Run Docker Image Build Tests
-    strategy:
-      matrix:
-        docker-image-suffix: [ py37, py38 ]
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout the Repository
-      - uses: harshanarayana/custom-actions@main
-        name: Run Docker Build for ${{ matrix.docker-image-suffix }}
-        id: build-image
-        with:
-          dockerfile-base-dir: './docker'
-          docker-image-suffix: ${{ matrix.docker-image-suffix }}
-          action: 'image-publish'
-          ignore-python-setup: 'true'
-      - run: echo "output set by ${{ steps.build-image.outputs.image-infra-version }}"
-        name: Display Docker Tool Version
-      - run: echo "output set by ${{ steps.build-image.outputs.image-infra-generated-list }}"
-        name: Display Docker Images generated during Test
+#  build:
+#    runs-on: ubuntu-latest
+#    name: Basic Build Test for the Repository
+#    steps:
+#      - uses: actions/checkout@v2
+#        name: Checkout the Repository
+#      - run: |
+#          npm install
+#        name: Install NPM Packages
+#      - run: |
+#          npm run all
+#        name: Run NPM Tasks
+#  test: # make sure the action works on a clean machine without building
+#    runs-on: ubuntu-latest
+#    name: Run Basic Actions from the Repo
+#    steps:
+#      - uses: actions/checkout@v2
+#        name: Checkout the Repository
+#      - uses: harshanarayana/custom-actions@main
+#        name: Run Basic Python Infrastructure Setup Action
+#        with:
+#          python-version: 3.7
+#  build-image:
+#    runs-on: ubuntu-latest
+#    name: Run Docker Image Build Tests
+#    strategy:
+#      matrix:
+#        docker-image-suffix: [ py37, py38 ]
+#    steps:
+#      - uses: actions/checkout@v2
+#        name: Checkout the Repository
+#      - uses: harshanarayana/custom-actions@main
+#        name: Run Docker Build for ${{ matrix.docker-image-suffix }}
+#        id: build-image
+#        with:
+#          dockerfile-base-dir: './docker'
+#          docker-image-suffix: ${{ matrix.docker-image-suffix }}
+#          action: 'image-publish'
+#          ignore-python-setup: 'true'
+#      - run: echo "output set by ${{ steps.build-image.outputs.image-infra-version }}"
+#        name: Display Docker Tool Version
+#      - run: echo "output set by ${{ steps.build-image.outputs.image-infra-generated-list }}"
+#        name: Display Docker Images generated during Test
   spell:
     runs-on: ubuntu-latest
     name: Spell Check Infra
     steps:
+      - uses: actions/checkout@v2
+        name: Checkout the Repository
       - name: Setup Custom Actions
         uses: harshanarayana/custom-actions@main
         with:

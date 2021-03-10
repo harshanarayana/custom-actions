@@ -2,6 +2,7 @@
 import {ExecOptions} from '@actions/exec/lib/interfaces'
 import * as exec from '@actions/exec'
 import * as core from '@actions/core'
+import execa from 'execa'
 
 export function argToMap(additionalArgs: string): Map<string, string> {
     const argArray = additionalArgs.split(/\s*,\s*/).map(part => part.split('='))
@@ -83,7 +84,7 @@ export async function commandRunnerWithEnv(
     stderrCallback: ((data: Buffer) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(true, silent, env, stdoutCallback, stderrCallback, null, null)
-    return await exec.exec(cmd, args, opts)
+    return await execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, null, null)
 }
 
 export async function commandRunner(
@@ -94,7 +95,7 @@ export async function commandRunner(
     stderrCallback: ((data: Buffer) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(true, silent, new Map<string, string>(), stdoutCallback, stderrCallback, null, null)
-    return await exec.exec(cmd, args, opts)
+    return await execaCommandRunner(cmd, args, new Map<string, string>(), stdoutCallback, stderrCallback, null, null)
 }
 
 export async function commandRunnerWithLineCallback(
@@ -106,5 +107,48 @@ export async function commandRunnerWithLineCallback(
     errLineCallback: ((data: string) => void) | null
 ): Promise<number> {
     const opts = createExecOpts(false, silent, env, null, null, stdLineCallback, errLineCallback)
-    return await exec.exec(cmd, args, opts)
+    return await execaCommandRunner(cmd, args, env, null, null, stdLineCallback, errLineCallback)
+}
+
+export async function execaCommandRunner(
+    cmd: string,
+    args: string[],
+    env: Map<string, string>,
+    stdoutCallback: ((data: Buffer) => void) | null,
+    stderrCallback: ((data: Buffer) => void) | null,
+    stdLineCallback: ((data: string) => void) | null,
+    errLineCallback: ((data: string) => void) | null
+): Promise<number> {
+    if (env !== undefined && env.size > 0) {
+        // eslint-disable-next-line github/array-foreach
+        env.forEach((value, key) => {
+            process.env[key] = value
+        })
+    }
+    const opts: execa.Options = {
+        cleanup: true,
+        stdout: process.stdout,
+        stderr: process.stderr,
+        extendEnv: true,
+        env: process.env,
+        buffer: true
+    }
+
+    const out = await execa(cmd, args, opts)
+    if (out.exitCode !== 0) {
+        if (stderrCallback !== null) {
+            stderrCallback(new Buffer(out.stderr))
+        }
+        if (errLineCallback !== null) {
+            errLineCallback(out.stderr)
+        }
+    } else {
+        if (stdoutCallback !== null) {
+            stdoutCallback(new Buffer(out.stdout))
+        }
+        if (stdLineCallback !== null) {
+            stdLineCallback(out.stdout)
+        }
+    }
+    return Promise.resolve(out.exitCode)
 }

@@ -27,6 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/glob": "^0.1.1",
+    "execa": "^5.0.0",
     "git-repo-info": "^2.1.1",
     "setup-python": "git+https://github.com/actions/setup-python.git"
   },
