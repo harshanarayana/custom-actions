@@ -60,6 +60,9 @@ class PyspellingInfra implements SpellCheckInfra {
     }
 
     async isSpellCheckEnv(): Promise<boolean> {
+        if (core.getInput('spellcheck-force') === 'true') {
+            return Promise.resolve(true)
+        }
         const pattern: string[] = ['**/.pyspelling.yml']
 
         const cfgFile = this.argMap.get('-c') || this.argMap.get('--config')

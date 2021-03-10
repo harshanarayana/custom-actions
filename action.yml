@@ -136,6 +136,10 @@ inputs:
     required: false
     description: 'Ignore Spell Check errors and do not fail the task'
     default: 'false'
+  spellcheck-force:
+    required: false
+    description: 'Force Spell check to Run Always if the action is set to spellcheck'
+    default: 'true'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."

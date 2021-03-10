@@ -1085,6 +1085,9 @@ class PyspellingInfra {
     }
     isSpellCheckEnv() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (core.getInput('spellcheck-force') === 'true') {
+                return Promise.resolve(true);
+            }
             const pattern = ['**/.pyspelling.yml'];
             const cfgFile = this.argMap.get('-c') || this.argMap.get('--config');
             if (cfgFile !== undefined && cfgFile.length > 0) {
