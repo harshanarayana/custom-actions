@@ -134,17 +134,18 @@ export async function execaCommandRunner(
         buffer: true
     }
 
+    core.info(`cmd: ${cmd}, args: ${args}, opts: ${opts}`)
     const out = await execa(cmd, args, opts)
     if (out.exitCode !== 0) {
         if (stderrCallback !== null) {
-            stderrCallback(new Buffer(out.stderr))
+            stderrCallback(Buffer.from(out.stderr))
         }
         if (errLineCallback !== null) {
             errLineCallback(out.stderr)
         }
     } else {
         if (stdoutCallback !== null) {
-            stdoutCallback(new Buffer(out.stdout))
+            stdoutCallback(Buffer.from(out.stdout))
         }
         if (stdLineCallback !== null) {
             stdLineCallback(out.stdout)

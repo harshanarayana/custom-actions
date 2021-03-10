@@ -1428,10 +1428,11 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
             env: process.env,
             buffer: true
         };
+        core.info(`cmd: ${cmd}, args: ${args}, opts: ${opts}`);
         const out = yield execa_1.default(cmd, args, opts);
         if (out.exitCode !== 0) {
             if (stderrCallback !== null) {
-                stderrCallback(new Buffer(out.stderr));
+                stderrCallback(Buffer.from(out.stderr));
             }
             if (errLineCallback !== null) {
                 errLineCallback(out.stderr);
@@ -1439,7 +1440,7 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
         }
         else {
             if (stdoutCallback !== null) {
-                stdoutCallback(new Buffer(out.stdout));
+                stdoutCallback(Buffer.from(out.stdout));
             }
             if (stdLineCallback !== null) {
                 stdLineCallback(out.stdout);
