@@ -157,10 +157,15 @@ export async function execaCommandRunner(
         buffer: true
     }
 
-    core.info(`cmd: ${cmd}, args: ${args}, opts: ${opts}`)
+    let cmdToLog = cmd
+    if (cmd === 'docker' && !args.includes('login')) {
+        cmdToLog += ` ${args}`
+    }
+
+    core.info(`Running Base command: ${cmdToLog}`)
     try {
         const out = await execa(cmd, args, opts)
-        core.info(`cmd: ${cmd} finished with ${out.exitCode} ${out.stdout} ${out.stderr}`)
+        core.info(`Command : ${cmdToLog} finished with ${out.exitCode}`)
         if (out.exitCode !== 0) {
             if (stderrCallback !== null) {
                 stderrCallback(Buffer.from(out.stderr))
@@ -178,7 +183,7 @@ export async function execaCommandRunner(
         }
         return Promise.resolve(out.exitCode)
     } catch (e) {
-        core.info(`cmd: ${cmd} finished with ${e}`)
+        core.info(`cmd: ${cmdToLog} finished with ${e}`)
     }
     return Promise.resolve(237)
 }
