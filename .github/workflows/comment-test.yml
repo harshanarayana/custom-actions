@@ -5,7 +5,7 @@ on:
       - created
 
 jobs:
-  commentManager:
+  commentbot:
     runs-on: ubuntu-latest
     name: Comment Bot
     steps:
@@ -16,3 +16,4 @@ jobs:
         with:
           ignore-python-setup: 'true'
           action: 'comment-bot'
+          git-access-token: ${{ secrets.MY_GITHUB_TOKEN }}

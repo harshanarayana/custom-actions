@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as github from '@actions/github'
 import {CommentManagerInfra} from '../types/types'
 import {readEventData} from '../utils/generic'
 
@@ -12,6 +13,14 @@ class RebaseInfra implements CommentManagerInfra {
     async handleComment(): Promise<boolean> {
         const data = await readEventData()
         core.info(`Event Data ${data}`)
+        const myToken = core.getInput('git-access-token')
+        const octokit = github.getOctokit(myToken)
+        await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+            owner: 'harshanarayana',
+            repo: 'custom-actions',
+            workflow_id: 'spellcheck.yml',
+            ref: 'ref'
+        })
         return Promise.resolve(false)
     }
 
