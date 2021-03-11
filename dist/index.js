@@ -950,6 +950,7 @@ class TwineInfra {
             const env = new Map();
             env.set('TWINE_USERNAME', this.pypiUser);
             env.set('TWINE_PASSWORD', this.pypiPassword);
+            additionalArgs.push(`${this.packageDir}/*`);
             const state = yield generic_1.commandRunnerWithEnv('twine', additionalArgs, true, env, null, null);
             if (state !== 0) {
                 throw new Error('Failed to publish Python package to PyPi');
