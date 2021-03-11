@@ -59,3 +59,10 @@ export interface SpellCheckInfra extends ConditionalRunnerInfra {
     setupPreRequisites(): Promise<number>
     findItAll(): Promise<number>
 }
+
+export interface CommentManagerInfra {
+    commentPatternToConsider: string
+
+    isValidCommentHandler(): Promise<boolean>
+    handleComment(): Promise<boolean>
+}

@@ -3,6 +3,8 @@ import {ExecOptions} from '@actions/exec/lib/interfaces'
 import * as exec from '@actions/exec'
 import * as core from '@actions/core'
 import execa from 'execa'
+import {promisify} from 'util'
+import * as fs from 'fs'
 
 export function argToMap(additionalArgs: string): Map<string, string> {
     const argArray = additionalArgs.split(/\s*,\s*/).map(part => part.split('='))
@@ -204,4 +206,20 @@ export async function execaCommandRunner(
         core.info(`cmd: ${cmdToLog} finished with ${e.stack}`)
     }
     return Promise.resolve(237)
+}
+
+export async function readEventData(): Promise<string> {
+    const readFile = promisify(fs.readFile)
+    async function getEvent(): Promise<Buffer | void> {
+        const eventFile: string | undefined = process.env.GITHUB_EVENT_PATH
+        if (eventFile !== undefined) {
+            return readFile(eventFile)
+        }
+        return Promise.resolve(undefined)
+    }
+    const data = await getEvent()
+    if (data !== undefined) {
+        return Promise.resolve(data.toString().trim())
+    }
+    return Promise.resolve('')
 }

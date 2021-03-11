@@ -2,6 +2,99 @@ require('./sourcemap-register.js');module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 1810:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getBranchRebaseInfra = void 0;
+const core = __importStar(__webpack_require__(2186));
+const generic_1 = __webpack_require__(1971);
+class RebaseInfra {
+    constructor(commentPatternToConsider) {
+        this.commentPatternToConsider = commentPatternToConsider;
+    }
+    handleComment() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = yield generic_1.readEventData();
+            core.info(`Event Data ${data}`);
+            return Promise.resolve(false);
+        });
+    }
+    isValidCommentHandler() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.resolve(true);
+        });
+    }
+}
+function getBranchRebaseInfra() {
+    const pattern = core.getInput('comment-rebase-pattern') || '.*\\@bot\\s+\\/rebase.*';
+    return new RebaseInfra(pattern);
+}
+exports.getBranchRebaseInfra = getBranchRebaseInfra;
+
+
+/***/ }),
+
+/***/ 8914:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.runCommentInfra = void 0;
+const rebase_1 = __webpack_require__(1810);
+function runCommentInfra() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const rebaseInfra = rebase_1.getBranchRebaseInfra();
+        if (yield rebaseInfra.isValidCommentHandler()) {
+            yield rebaseInfra.handleComment();
+        }
+    });
+}
+exports.runCommentInfra = runCommentInfra;
+
+
+/***/ }),
+
 /***/ 6745:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -734,6 +827,7 @@ const lint_infra_1 = __webpack_require__(8986);
 const package_infra_1 = __webpack_require__(322);
 const image_infra_1 = __webpack_require__(5999);
 const spell_infra_1 = __webpack_require__(9868);
+const comment_infra_1 = __webpack_require__(8914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -763,6 +857,10 @@ function run() {
                 case 'spellcheck':
                 case 'typo':
                     yield spell_infra_1.runSpellCheck();
+                    break;
+                case 'comment':
+                case 'comment-bot':
+                    yield comment_infra_1.runCommentInfra();
                     break;
                 default:
                     core.info(`Plugin action ${action} is a non supported entity`);
@@ -1343,10 +1441,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.execaCommandRunner = exports.commandRunnerWithLineCallback = exports.commandRunner = exports.commandRunnerWithEnv = exports.argToMap = void 0;
+exports.readEventData = exports.execaCommandRunner = exports.commandRunnerWithLineCallback = exports.commandRunner = exports.commandRunnerWithEnv = exports.argToMap = void 0;
 const exec = __importStar(__webpack_require__(1514));
 const core = __importStar(__webpack_require__(2186));
 const execa_1 = __importDefault(__webpack_require__(5447));
+const util_1 = __webpack_require__(1669);
+const fs = __importStar(__webpack_require__(5747));
 function argToMap(additionalArgs) {
     const argArray = additionalArgs.split(/\s*,\s*/).map(part => part.split('='));
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -1511,6 +1611,26 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
     });
 }
 exports.execaCommandRunner = execaCommandRunner;
+function readEventData() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const readFile = util_1.promisify(fs.readFile);
+        function getEvent() {
+            return __awaiter(this, void 0, void 0, function* () {
+                const eventFile = process.env.GITHUB_EVENT_PATH;
+                if (eventFile !== undefined) {
+                    return readFile(eventFile);
+                }
+                return Promise.resolve(undefined);
+            });
+        }
+        const data = yield getEvent();
+        if (data !== undefined) {
+            return Promise.resolve(data.toString().trim());
+        }
+        return Promise.resolve('');
+    });
+}
+exports.readEventData = readEventData;
 
 
 /***/ }),

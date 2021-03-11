@@ -7,6 +7,7 @@ import {runLinter} from './core/lint-infra'
 import {runPackagePublish} from './core/package-infra'
 import {runImageBuilder} from './core/image-infra'
 import {runSpellCheck} from './core/spell-infra'
+import {runCommentInfra} from './core/comment-infra'
 
 async function run(): Promise<void> {
     try {
@@ -36,6 +37,10 @@ async function run(): Promise<void> {
             case 'spellcheck':
             case 'typo':
                 await runSpellCheck()
+                break
+            case 'comment':
+            case 'comment-bot':
+                await runCommentInfra()
                 break
             default:
                 core.info(`Plugin action ${action} is a non supported entity`)
