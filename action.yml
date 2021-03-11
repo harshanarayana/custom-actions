@@ -140,6 +140,14 @@ inputs:
     required: false
     description: 'Force Spell check to Run Always if the action is set to spellcheck'
     default: 'true'
+  comment-rebase-pattern:
+    required: false
+    description: 'Rebase Comment Pattern Indicator'
+    default: '.*\@bot\s+\/rebase.*'
+  git-access-token:
+    required: false
+    description: 'GitHub Access Token for interacting with Git Infra'
+    default: ''
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."

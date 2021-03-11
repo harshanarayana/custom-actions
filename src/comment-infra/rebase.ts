@@ -19,7 +19,7 @@ class RebaseInfra implements CommentManagerInfra {
             owner: 'harshanarayana',
             repo: 'custom-actions',
             workflow_id: 'spellcheck.yml',
-            ref: 'ref'
+            ref: process.env.GITHUB_REF || 'ref'
         })
         return Promise.resolve(false)
     }
