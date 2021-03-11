@@ -56,6 +56,12 @@ class RebaseInfra {
                 workflow_id: 'spellcheck.yml',
                 ref: process.env.GITHUB_REF || 'ref'
             });
+            const checkInfo = yield octokit.request('GET /repos/{owner}/{repo}/commits/{ref}/check-runs', {
+                owner: 'harshanarayana',
+                repo: 'custom-actions',
+                ref: process.env.GITHUB_REF || 'ref'
+            });
+            core.info(JSON.stringify(checkInfo));
             return Promise.resolve(false);
         });
     }
