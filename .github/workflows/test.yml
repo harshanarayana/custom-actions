@@ -50,15 +50,3 @@ jobs:
         name: Display Docker Tool Version
       - run: echo "output set by ${{ steps.build-image.outputs.image-infra-generated-list }}"
         name: Display Docker Images generated during Test
-  spell:
-    runs-on: ubuntu-latest
-    name: Spell Check Infra
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout the Repository
-      - name: Setup Custom Actions
-        uses: harshanarayana/custom-actions@main
-        with:
-          action: 'spellcheck'
-          python-version: 3.9
-          spellcheck-ignore-errors: 'true'

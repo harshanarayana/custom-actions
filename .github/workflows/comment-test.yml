@@ -1,0 +1,18 @@
+name: Test PR Comment Workflow
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  commentManager:
+    runs-on: ubuntu-latest
+    name: Comment Bot
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout the Repository
+      - uses: harshanarayana/custom-actions@main
+        name: Run Comment Bot
+        with:
+          ignore-python-setup: 'true'
+          action: 'comment-bot'
