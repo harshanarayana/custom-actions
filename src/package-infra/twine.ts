@@ -73,7 +73,7 @@ class TwineInfra implements PackagePublishInfra {
         const env: Map<string, string> = new Map<string, string>()
         env.set('TWINE_USERNAME', this.pypiUser)
         env.set('TWINE_PASSWORD', this.pypiPassword)
-        // additionalArgs.push(`${this.packageDir}/*`)
+        additionalArgs.push(`${this.packageDir}/*`)
         // additionalArgs.push(...['-u', this.pypiUser, '-p', this.pypiPassword])
         const state = await commandRunnerWithEnv('twine', additionalArgs, true, env, null, null)
         if (state !== 0) {
