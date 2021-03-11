@@ -39,3 +39,4 @@ jobs:
           pypi-user: __token__
           pypi-access-token: ${{ secrets.PYPI_ACCESS_TOKEN }}
           action: 'package-publish'
+          pypi-verify-metadata: 'false'
