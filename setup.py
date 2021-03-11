@@ -52,6 +52,7 @@ setup_kwargs = {
     "packages": find_packages(),
     "platforms": "any",
     "python_requires": ">=3.7",
+    "long_description_content_type": 'text/markdown',
     "classifiers": [
         "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
