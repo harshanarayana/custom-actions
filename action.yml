@@ -76,7 +76,7 @@ inputs:
     required: false
     description: 'Verify package metadata before publishing'
     default: 'true'
-  pypi-skip-exisint:
+  pypi-skip-existing:
     required: false
     description: 'Skip If the Version of the package already exists for publishing'
     default: 'true'

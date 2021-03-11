@@ -22,7 +22,15 @@ class BlackInfra implements LinterInfra {
     }
 
     async runLinter(): Promise<number> {
-        return commandRunner('black', [], true, null, null)
+        const args: string[] = []
+        if (this.argMap !== undefined && this.argMap.size > 0) {
+            // eslint-disable-next-line github/array-foreach,@typescript-eslint/no-unused-vars
+            this.argMap.forEach((value, key, map) => {
+                args.push(key)
+                args.push(value)
+            })
+        }
+        return commandRunner('black', args, true, null, null)
     }
 
     async setVersion(): Promise<number> {

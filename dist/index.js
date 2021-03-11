@@ -663,7 +663,15 @@ class BlackInfra {
     }
     runLinter() {
         return __awaiter(this, void 0, void 0, function* () {
-            return generic_1.commandRunner('black', [], true, null, null);
+            const args = [];
+            if (this.argMap !== undefined && this.argMap.size > 0) {
+                // eslint-disable-next-line github/array-foreach,@typescript-eslint/no-unused-vars
+                this.argMap.forEach((value, key, map) => {
+                    args.push(key);
+                    args.push(value);
+                });
+            }
+            return generic_1.commandRunner('black', args, true, null, null);
         });
     }
     setVersion() {
