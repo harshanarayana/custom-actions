@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    name: Using ${{ matrix.config.python-version }}
+    name: Using ${{ matrix.config.python-version }} on ${{ matrix.os }} for ${{ matrix.config.tox-env }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -30,6 +30,7 @@ jobs:
           test-infra-tool: 'tox'
           test-infra-version: 'latest'
           action: 'tests'
+          test-additional-args: "-e ${{ matrix.config.tox-env }}"
       - name: Publish Sample pacakge
         uses: harshanarayana/custom-actions@main
         with:
