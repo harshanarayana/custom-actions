@@ -35,9 +35,10 @@ export async function installPythonPackage(infra: BaseInfra): Promise<number> {
 }
 
 export async function buildWheelFiles(): Promise<number> {
+    const distPath = core.getInput('pypi-package-dir') || 'dist/'
     return commandRunner(
         'python',
-        ['-m', 'build', '--sdist', '--wheel', '--outdir', 'dist/'],
+        ['-m', 'build', '--sdist', '--wheel', '--outdir', distPath],
         true,
         data => {
             core.info(data.toString().trim())

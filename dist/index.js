@@ -76,7 +76,8 @@ function installPythonPackage(infra) {
 exports.installPythonPackage = installPythonPackage;
 function buildWheelFiles() {
     return __awaiter(this, void 0, void 0, function* () {
-        return generic_1.commandRunner('python', ['-m', 'build', '--sdist', '--wheel', '--outdir', 'dist/'], true, data => {
+        const distPath = core.getInput('pypi-package-dir') || 'dist/';
+        return generic_1.commandRunner('python', ['-m', 'build', '--sdist', '--wheel', '--outdir', distPath], true, data => {
             core.info(data.toString().trim());
         }, data => {
             core.error(data.toString().trim());
