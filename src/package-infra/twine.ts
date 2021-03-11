@@ -59,6 +59,7 @@ class TwineInfra implements PackagePublishInfra {
         if (!distBuilt) {
             throw new Error(`PyPi publish will not continue as we did not find any wheel or tar.gz artifact to publish`)
         }
+        await this.validate()
         const additionalArgs: string[] = ['upload', '--verbose']
         if (this.skipExisting || this.argMap.get('--skip-existing') === 'true') {
             additionalArgs.push('--skip-existing')
@@ -70,10 +71,10 @@ class TwineInfra implements PackagePublishInfra {
             }
         }
         const env: Map<string, string> = new Map<string, string>()
-        // env.set('TWINE_USERNAME', this.pypiUser)
-        // env.set('TWINE_PASSWORD', this.pypiPassword)
-        additionalArgs.push(`${this.packageDir}/*`)
-        additionalArgs.push(...['-d', this.pypiUser, '-p', this.pypiPassword])
+        env.set('TWINE_USERNAME', this.pypiUser)
+        env.set('TWINE_PASSWORD', this.pypiPassword)
+        // additionalArgs.push(`${this.packageDir}/*`)
+        // additionalArgs.push(...['-u', this.pypiUser, '-p', this.pypiPassword])
         const state = await commandRunnerWithEnv('twine', additionalArgs, true, env, null, null)
         if (state !== 0) {
             throw new Error('Failed to publish Python package to PyPi')
