@@ -106,13 +106,11 @@ all_require = dev_require + docs_require
 
 if strtobool(os.environ.get("SANIC_NO_UJSON", "no")):
     print("Installing without uJSON")
-    requirements.remove(ujson)
     tests_require.remove(ujson)
 
 # 'nt' means windows OS
 if strtobool(os.environ.get("SANIC_NO_UVLOOP", "no")):
     print("Installing without uvLoop")
-    requirements.remove(uvloop)
     tests_require.remove(uvloop)
 
 extras_require = {
