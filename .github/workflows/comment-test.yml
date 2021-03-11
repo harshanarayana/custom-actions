@@ -16,3 +16,4 @@ jobs:
         with:
           ignore-python-setup: 'true'
           action: 'comment-bot'
+          git-access-token: ${{ secrets.MY_GITHUB_TOKEN }}
