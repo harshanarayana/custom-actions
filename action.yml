@@ -71,7 +71,7 @@ inputs:
   pypi-package-dir:
     required: false
     description: 'Directory to use for creating Dist packages'
-    default: 'dist'
+    default: 'pydist'
   pypi-verify-metadata:
     required: false
     description: 'Verify package metadata before publishing'
