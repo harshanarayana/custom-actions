@@ -2,11 +2,10 @@
 import {ExecOptions} from '@actions/exec/lib/interfaces'
 import * as exec from '@actions/exec'
 import * as core from '@actions/core'
-import * as io from '@actions/io'
 import execa from 'execa'
 import {promisify} from 'util'
 import * as fs from 'fs'
-import * as jq from 'node-jq'
+import * as jsonPath from 'jsonpath-plus'
 
 export function argToMap(additionalArgs: string): Map<string, string> {
     const argArray = additionalArgs.split(/\s*,\s*/).map(part => part.split('='))
@@ -226,13 +225,8 @@ export async function readEventData(): Promise<string> {
     return Promise.resolve('')
 }
 
-export async function getIssueNumber(): Promise<number> {
-    const jqPath = await io.which('jq', true)
-    const issuePathFilter = '.issue.number'
-    const eventFile: string | undefined = process.env.GITHUB_EVENT_PATH
-    if (eventFile !== undefined) {
-        const issueNumber = await jq.run(issuePathFilter, eventFile, {}, jqPath)
-        return Promise.resolve(parseInt(issueNumber.toString()))
-    }
-    return Promise.resolve(0)
+export async function getIssueNumber(jsonString: string): Promise<number> {
+    const issuePathFilter = '$.issue.number'
+    const issueNumber = jsonPath.JSONPath({path: issuePathFilter, json: JSON.parse(jsonString)})[0]
+    return Promise.resolve(parseInt(issueNumber.toString()))
 }

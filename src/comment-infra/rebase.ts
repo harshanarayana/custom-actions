@@ -29,7 +29,7 @@ class RebaseInfra implements CommentManagerInfra {
         await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
             owner: 'harshanarayana',
             repo: 'custom-actions',
-            issue_number: await getIssueNumber(),
+            issue_number: await getIssueNumber(data),
             body: 'Howdy Stranger!'
         })
         core.info(JSON.stringify(checkInfo))
