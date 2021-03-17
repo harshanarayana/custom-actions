@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {CommentManagerInfra} from '../types/types'
-import {readEventData} from '../utils/generic'
+import {readEventData, getIssueNumber} from '../utils/generic'
 
 class RebaseInfra implements CommentManagerInfra {
     commentPatternToConsider: string
@@ -25,6 +25,12 @@ class RebaseInfra implements CommentManagerInfra {
             owner: 'harshanarayana',
             repo: 'custom-actions',
             ref: process.env.GITHUB_REF || 'ref'
+        })
+        await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+            owner: 'harshanarayana',
+            repo: 'custom-actions',
+            issue_number: await getIssueNumber(),
+            body: 'Howdy Stranger!'
         })
         core.info(JSON.stringify(checkInfo))
         return Promise.resolve(false)

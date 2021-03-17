@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Checkout the Repository
-      - uses: harshanarayana/custom-actions@main
+      - uses: ./
         name: Run Comment Bot
         with:
           ignore-python-setup: 'true'
