@@ -687,15 +687,19 @@ class DockerInfra {
         const repoInfo = git_repo_info_1.default();
         this.gitTag = repoInfo.tag || 'latest';
     }
+    getTags() {
+        let tags = [`${this.gitTag}`, `${this.gitTag}-latest`];
+        if (this.imagePrefix !== undefined && this.imagePrefix.length > 0) {
+            tags = [`${this.imagePrefix}-${this.gitTag}`, `${this.imagePrefix}-latest`];
+        }
+        if (this.imageTag !== undefined && this.imageTag.length > 0) {
+            tags = [this.imageTag];
+        }
+        return tags;
+    }
     buildImage() {
         return __awaiter(this, void 0, void 0, function* () {
-            let tags = [`${this.gitTag}`, `${this.gitTag}-latest`];
-            if (this.imagePrefix !== undefined && this.imagePrefix.length > 0) {
-                tags = [`${this.imagePrefix}-${this.gitTag}`, `${this.imagePrefix}-latest`];
-            }
-            if (this.imageTag !== undefined && this.imageTag.length > 0) {
-                tags = [this.imageTag];
-            }
+            const tags = this.getTags();
             let imageFile = `${this.dockerFilePath}/Dockerfile`;
             if (this.fileSuffix !== undefined && this.fileSuffix.length > 0) {
                 imageFile = `${this.dockerFilePath}/Dockerfile-${this.fileSuffix}`;
@@ -752,8 +756,8 @@ class DockerInfra {
                 return Promise.resolve(undefined);
             }
             yield this.login();
-            for (const tag of [`${this.imagePrefix}-${this.gitTag}`, `${this.imagePrefix}-latest`]) {
-                if (tag.endsWith('-latest') && !this.tagAsLatest) {
+            for (const tag of this.getTags()) {
+                if (tag.endsWith('latest') && !this.tagAsLatest) {
                     core.info('Since tag-image-as-latest property is not set to true, the image will not be published as latest');
                     continue;
                 }

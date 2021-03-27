@@ -91,7 +91,7 @@ inputs:
   docker-image-prefix:
     required: false
     description: 'Common Prefix used to append to the generated image tag'
-    default: 'py37'
+    default: ''
   tag-image-as-latest:
     required: false
     description: 'Tag Image using the base Prefix and tag as latest'

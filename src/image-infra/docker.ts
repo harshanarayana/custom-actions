@@ -43,7 +43,7 @@ class DockerInfra implements ImageInfra {
         this.gitTag = repoInfo.tag || 'latest'
     }
 
-    async buildImage(): Promise<void> {
+    getTags(): string[] {
         let tags = [`${this.gitTag}`, `${this.gitTag}-latest`]
         if (this.imagePrefix !== undefined && this.imagePrefix.length > 0) {
             tags = [`${this.imagePrefix}-${this.gitTag}`, `${this.imagePrefix}-latest`]
@@ -51,6 +51,11 @@ class DockerInfra implements ImageInfra {
         if (this.imageTag !== undefined && this.imageTag.length > 0) {
             tags = [this.imageTag]
         }
+        return tags
+    }
+
+    async buildImage(): Promise<void> {
+        const tags = this.getTags()
         let imageFile = `${this.dockerFilePath}/Dockerfile`
         if (this.fileSuffix !== undefined && this.fileSuffix.length > 0) {
             imageFile = `${this.dockerFilePath}/Dockerfile-${this.fileSuffix}`
@@ -112,8 +117,8 @@ class DockerInfra implements ImageInfra {
             return Promise.resolve(undefined)
         }
         await this.login()
-        for (const tag of [`${this.imagePrefix}-${this.gitTag}`, `${this.imagePrefix}-latest`]) {
-            if (tag.endsWith('-latest') && !this.tagAsLatest) {
+        for (const tag of this.getTags()) {
+            if (tag.endsWith('latest') && !this.tagAsLatest) {
                 core.info(
                     'Since tag-image-as-latest property is not set to true, the image will not be published as latest'
                 )
