@@ -20,6 +20,7 @@ class DockerInfra implements ImageInfra {
     dockerFilePath: string
     push: boolean
     buildArgs: string
+    imageTag: string
 
     constructor() {
         this.additionalArgs = ''
@@ -35,12 +36,17 @@ class DockerInfra implements ImageInfra {
         this.dockerFilePath = core.getInput('dockerfile-base-dir')
         this.push = core.getInput('push-images') === 'true'
         this.buildArgs = core.getInput('docker-build-args')
+        this.imageTag = core.getInput('docker-image-tag')
         const repoInfo: g.GitRepoInfo = gitRepoInfo()
         this.gitTag = repoInfo.tag || 'latest'
     }
 
     async buildImage(): Promise<void> {
-        for (const tag of [`${this.imageSuffix}-${this.gitTag}`, `${this.imageSuffix}-latest`]) {
+        let tags = [`${this.imageSuffix}-${this.gitTag}`, `${this.imageSuffix}-latest`]
+        if (this.imageTag !== undefined && this.imageTag.length > 0) {
+            tags = [this.imageTag]
+        }
+        for (const tag of tags) {
             if (tag.endsWith('-latest') && !this.tagAsLatest) {
                 core.info(
                     'Since tag-image-as-latest property is not set to true, the image will not be tagged as latest'

@@ -112,6 +112,10 @@ inputs:
     required: false
     description: 'Base Image path for pushing the docker'
     default: 'sanicframework/sanic'
+  docker-image-tag:
+    required: false
+    description: 'Custom Image tag to use for publishing Docker images'
+    default: ''
   docker-build-args:
     required: false
     description: 'Build Args to use for generating Docker Images'
