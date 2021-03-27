@@ -237,6 +237,9 @@ export async function execaCommandRunner(
             core.info(`Ignoring the failure of command ${cmdToLog} as it is marked as experimental feature`)
             return Promise.resolve(0)
         }
+        if (subCommand.exitCode !== null) {
+            return Promise.resolve(subCommand.exitCode)
+        }
     }
     return Promise.resolve(237)
 }
