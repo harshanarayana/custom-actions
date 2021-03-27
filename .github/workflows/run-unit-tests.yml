@@ -26,7 +26,7 @@ jobs:
           test-infra-tool: 'tox'
           test-infra-version: 'latest'
           action: 'tests'
-          test-additional-args: "-e=${{ matrix.config.tox-env }},-c=custom-actions/tox.ini"
+          test-additional-args: "-e=${{ matrix.config.tox-env }}"
           experimental-ignore-error: "${{ matrix.config.experimental-ignore-error }}"
       - name: Publish Sample pacakge
         uses: harshanarayana/custom-actions@main
