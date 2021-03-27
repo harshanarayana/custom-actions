@@ -46,6 +46,10 @@ jobs:
           docker-image-suffix: ${{ matrix.docker-image-suffix }}
           action: 'image-publish'
           ignore-python-setup: 'true'
+          image-base-name: harshanarayana/custom-actions
+          registry-auth-user: harshanarayana
+          registry-auth-password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          push-images: 'true'
       - run: echo "output set by ${{ steps.build-image.outputs.image-infra-version }}"
         name: Display Docker Tool Version
       - run: echo "output set by ${{ steps.build-image.outputs.image-infra-generated-list }}"
