@@ -46,7 +46,7 @@ jobs:
           docker-image-suffix: ${{ matrix.docker-image-suffix }}
           action: 'image-publish'
           ignore-python-setup: 'true'
-          image-base-name: harshanarayana/custom-actions
+          docker-image-base-name: harshanarayana/custom-actions
           registry-auth-user: harshanarayana
           registry-auth-password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
           push-images: 'true'

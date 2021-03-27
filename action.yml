@@ -104,6 +104,10 @@ inputs:
     required: false
     description: 'Password to authenticate against the docker registry'
     default: 'myfakepassword'
+  push-images:
+    required: false
+    description: 'Push Generated Docker Image to upstream'
+    default: 'false'
   docker-image-base-name:
     required: false
     description: 'Base Image path for pushing the docker'
