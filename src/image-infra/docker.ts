@@ -53,7 +53,7 @@ class DockerInfra implements ImageInfra {
         }
         let imageFile = `${this.dockerFilePath}/Dockerfile`
         if (this.fileSuffix !== undefined && this.fileSuffix.length > 0) {
-            imageFile = `${this.dockerFilePath}/Dockerfile-${this.imagePrefix}`
+            imageFile = `${this.dockerFilePath}/Dockerfile-${this.fileSuffix}`
         }
         for (const tag of tags) {
             if (tag.endsWith('latest') && !this.tagAsLatest) {
