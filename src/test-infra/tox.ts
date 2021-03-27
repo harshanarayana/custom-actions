@@ -118,12 +118,12 @@ class ToxInfra implements TestInfra {
             if (k === '-c' || k === '-e') {
                 continue
             }
+            if (k.startsWith('-v')) {
+                additionalArg.push(k)
+                continue
+            }
             const v = this.argMap.get(k)
-            if (v === undefined || v === '') {
-                additionalArg.push(...[k])
-            } else if (v.length < 1) {
-                additionalArg.push(...[k])
-            } else {
+            if (v !== undefined) {
                 additionalArg.push(...[k, v])
             }
         }
