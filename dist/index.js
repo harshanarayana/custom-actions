@@ -1475,7 +1475,7 @@ class ToxInfra {
                     continue;
                 }
                 const v = this.argMap.get(k);
-                if (v === undefined) {
+                if (v === undefined || v === '') {
                     additionalArg.push(...[k]);
                 }
                 else if (v.length < 1) {
