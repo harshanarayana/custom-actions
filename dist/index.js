@@ -458,6 +458,8 @@ function setupPythonInfra() {
         const pipVersion = core.getInput('pip-version');
         let pyImpl;
         let pyVersion;
+        core.startGroup(`Setting up Python Version: ${version} on ${arch} with Pip: ${pipVersion}`);
+        core.startGroup(`Setting Up Python Infrastructure`);
         if (version.startsWith('pypy')) {
             core.info(`##[pypy-python-install] Installing Python Version ${version} on ${arch}`);
             const installed = yield finderPypy.findPyPyVersion(version, arch);
@@ -472,10 +474,14 @@ function setupPythonInfra() {
             pyImpl = installed.impl;
             pyVersion = installed.version;
         }
+        core.endGroup();
+        core.startGroup(`Setting up pip Infrastructure`);
         const pipInfra = pip_1.getPipInfra(pipVersion);
         yield comon_1.installPythonPackage(pipInfra);
         const buildInfra = build_1.getBuildToolInfra('latest');
         yield comon_1.installPythonPackage(buildInfra);
+        core.endGroup();
+        core.endGroup();
         return { impl: pyImpl, version: pyVersion };
     });
 }
@@ -593,14 +599,22 @@ function runTests() {
     return __awaiter(this, void 0, void 0, function* () {
         const name = core.getInput('test-infra-tool');
         const version = core.getInput('test-infra-version');
+        core.startGroup(`Running Test infra with tool: ${name} and version ${version}`);
         switch (name.toLowerCase()) {
             case 'tox': {
                 const infra = tox_1.getToxInfra(version, core.getInput('test-tool-install-force') === 'true', core.getInput('test-additional-args'));
+                core.startGroup(`Setting up Tox dependencies`);
                 yield comon_1.installPythonPackage(infra);
+                core.endGroup();
                 yield infra.setVersion();
-                return infra.runTests();
+                core.startGroup(`Running Tox Tests`);
+                const stat = yield infra.runTests();
+                core.endGroup();
+                core.endGroup();
+                return Promise.resolve(stat);
             }
             default: {
+                core.endGroup();
                 throw new Error(`Invalid Test Infra with Name ${name} and version ${version}`);
             }
         }
@@ -865,8 +879,9 @@ const spell_infra_1 = __webpack_require__(9868);
 const comment_infra_1 = __webpack_require__(8914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const action = core.getInput('action');
+        core.startGroup(`Workflow Handler for Action: ${action}`);
         try {
-            const action = core.getInput('action');
             yield python_1.setupPythonInfra();
             const matchersPath = path_1.default.join(__dirname, '..', '.github');
             core.info(`##[add-matcher]${path_1.default.join(matchersPath, 'python.json')}`);
@@ -904,6 +919,7 @@ function run() {
         catch (err) {
             core.setFailed(err.message);
         }
+        core.endGroup();
     });
 }
 run();
@@ -1333,10 +1349,23 @@ class ToxInfra {
         this.force = force;
         this.additionalArgs = additionalArg;
         this.argMap = generic_1.argToMap(additionalArg);
+        core.info(`Args Map ${this.argMap}`);
     }
     isToxEnv() {
         return __awaiter(this, void 0, void 0, function* () {
-            const g = yield glob.create(['./tox.ini', './pyproject.toml', './setup.cfg', '**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join('\n'), {
+            const configFiles = [
+                './tox.ini',
+                './pyproject.toml',
+                './setup.cfg',
+                '**/tox.ini',
+                '**/pyproject.toml',
+                '**/setup.cfg'
+            ];
+            const conf = this.argMap.get('-c');
+            if (conf !== undefined && conf.length > 0) {
+                configFiles.push(conf);
+            }
+            const g = yield glob.create(configFiles.join('\n'), {
                 followSymbolicLinks: false
             });
             const files = yield g.glob();
@@ -1365,11 +1394,15 @@ class ToxInfra {
             if (!toxRequired) {
                 return common_1.NonToxRepo;
             }
+            const args = ['-l'];
+            const conf = this.argMap.get('-c');
+            if (conf !== undefined && conf.length > 0) {
+                args.push(...['-c', conf]);
+            }
             const output = [];
-            yield generic_1.commandRunner('tox', ['-l'], true, (function (out) {
+            yield generic_1.commandRunner('tox', args, true, (function (out) {
                 return (data) => {
                     const bData = data.toString().trim();
-                    core.info(bData);
                     out.push(...bData.split('\n'));
                 };
             })(output), (data) => {
@@ -1404,11 +1437,11 @@ class ToxInfra {
                 }
                 additionalArg.push(...['-e', this.envName()]);
             }
-            const state = yield generic_1.commandRunner('tox', additionalArg, true, (data) => {
-                core.info(data.toString().trim());
-            }, (data) => {
-                core.error(data.toString().trim());
-            });
+            const conf = this.argMap.get('-c');
+            if (conf !== undefined && conf.length > 0) {
+                additionalArg.push(...['-c', conf]);
+            }
+            const state = yield generic_1.commandRunner('tox', additionalArg, true, null, null);
             if (state !== 0) {
                 throw new Error(`Tox Environment ${this.envName()} run completed with an exit code ${state}`);
             }
@@ -1421,11 +1454,7 @@ class ToxInfra {
                 core.setOutput('test-infra-version', 'na');
                 return 0;
             }
-            return yield generic_1.commandRunner('tox', ['--version'], true, (data) => {
-                core.setOutput('test-infra-version', data.toString().trim());
-            }, (data) => {
-                core.error(data.toString().trim());
-            });
+            return yield generic_1.commandRunner('tox', ['--version'], true, null, null);
         });
     }
 }

@@ -17,17 +17,25 @@ class ToxInfra implements TestInfra {
         this.force = force
         this.additionalArgs = additionalArg
         this.argMap = argToMap(additionalArg)
+        core.info(`Args Map ${this.argMap}`)
     }
 
     async isToxEnv(): Promise<boolean> {
-        const g = await glob.create(
-            ['./tox.ini', './pyproject.toml', './setup.cfg', '**/tox.ini', '**/pyproject.toml', '**/setup.cfg'].join(
-                '\n'
-            ),
-            {
-                followSymbolicLinks: false
-            }
-        )
+        const configFiles = [
+            './tox.ini',
+            './pyproject.toml',
+            './setup.cfg',
+            '**/tox.ini',
+            '**/pyproject.toml',
+            '**/setup.cfg'
+        ]
+        const conf = this.argMap.get('-c')
+        if (conf !== undefined && conf.length > 0) {
+            configFiles.push(conf)
+        }
+        const g = await glob.create(configFiles.join('\n'), {
+            followSymbolicLinks: false
+        })
         const files = await g.glob()
         core.info(`Found Matching files are ${files}`)
         return files.length >= 1
@@ -53,15 +61,19 @@ class ToxInfra implements TestInfra {
         if (!toxRequired) {
             return NonToxRepo
         }
+        const args = ['-l']
+        const conf = this.argMap.get('-c')
+        if (conf !== undefined && conf.length > 0) {
+            args.push(...['-c', conf])
+        }
         const output: string[] = []
         await commandRunner(
             'tox',
-            ['-l'],
+            args,
             true,
             (function (out: string[]): (data: Buffer) => void {
                 return (data: Buffer) => {
                     const bData = data.toString().trim()
-                    core.info(bData)
                     out.push(...bData.split('\n'))
                 }
             })(output),
@@ -96,17 +108,11 @@ class ToxInfra implements TestInfra {
             }
             additionalArg.push(...['-e', this.envName()])
         }
-        const state = await commandRunner(
-            'tox',
-            additionalArg,
-            true,
-            (data: Buffer) => {
-                core.info(data.toString().trim())
-            },
-            (data: Buffer) => {
-                core.error(data.toString().trim())
-            }
-        )
+        const conf = this.argMap.get('-c')
+        if (conf !== undefined && conf.length > 0) {
+            additionalArg.push(...['-c', conf])
+        }
+        const state = await commandRunner('tox', additionalArg, true, null, null)
 
         if (state !== 0) {
             throw new Error(`Tox Environment ${this.envName()} run completed with an exit code ${state}`)
@@ -119,17 +125,7 @@ class ToxInfra implements TestInfra {
             core.setOutput('test-infra-version', 'na')
             return 0
         }
-        return await commandRunner(
-            'tox',
-            ['--version'],
-            true,
-            (data: Buffer) => {
-                core.setOutput('test-infra-version', data.toString().trim())
-            },
-            (data: Buffer) => {
-                core.error(data.toString().trim())
-            }
-        )
+        return await commandRunner('tox', ['--version'], true, null, null)
     }
 }
 

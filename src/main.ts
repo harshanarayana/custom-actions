@@ -10,8 +10,9 @@ import {runSpellCheck} from './core/spell-infra'
 import {runCommentInfra} from './core/comment-infra'
 
 async function run(): Promise<void> {
+    const action = core.getInput('action')
+    core.startGroup(`Workflow Handler for Action: ${action}`)
     try {
-        const action = core.getInput('action')
         await setupPythonInfra()
         const matchersPath = path.join(__dirname, '..', '.github')
         core.info(`##[add-matcher]${path.join(matchersPath, 'python.json')}`)
@@ -48,6 +49,7 @@ async function run(): Promise<void> {
     } catch (err) {
         core.setFailed(err.message)
     }
+    core.endGroup()
 }
 
 run()

@@ -21,6 +21,8 @@ export async function setupPythonInfra(): Promise<InstalledVersion | void> {
     const pipVersion = core.getInput('pip-version')
     let pyImpl: string
     let pyVersion: string
+    core.startGroup(`Setting up Python Version: ${version} on ${arch} with Pip: ${pipVersion}`)
+    core.startGroup(`Setting Up Python Infrastructure`)
     if (version.startsWith('pypy')) {
         core.info(`##[pypy-python-install] Installing Python Version ${version} on ${arch}`)
         const installed = await finderPypy.findPyPyVersion(version, arch)
@@ -36,9 +38,13 @@ export async function setupPythonInfra(): Promise<InstalledVersion | void> {
         pyImpl = installed.impl
         pyVersion = installed.version
     }
+    core.endGroup()
+    core.startGroup(`Setting up pip Infrastructure`)
     const pipInfra = getPipInfra(pipVersion)
     await installPythonPackage(pipInfra)
     const buildInfra = getBuildToolInfra('latest')
     await installPythonPackage(buildInfra)
+    core.endGroup()
+    core.endGroup()
     return {impl: pyImpl, version: pyVersion}
 }
