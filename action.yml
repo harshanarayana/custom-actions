@@ -112,6 +112,10 @@ inputs:
     required: false
     description: 'Base Image path for pushing the docker'
     default: 'sanicframework/sanic'
+  docker-build-args:
+    required: false
+    description: 'Build Args to use for generating Docker Images'
+    default: ''
   dockerfile-base-dir:
     required: false
     description: 'In case if you have the docker file defined in sub path, you can specify that directory'

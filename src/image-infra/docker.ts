@@ -19,6 +19,7 @@ class DockerInfra implements ImageInfra {
     imageBaseName: string
     dockerFilePath: string
     push: boolean
+    buildArgs: string
 
     constructor() {
         this.additionalArgs = ''
@@ -33,6 +34,7 @@ class DockerInfra implements ImageInfra {
         this.imageBaseName = core.getInput('docker-image-base-name')
         this.dockerFilePath = core.getInput('dockerfile-base-dir')
         this.push = core.getInput('push-images') === 'true'
+        this.buildArgs = core.getInput('docker-build-args')
         const repoInfo: g.GitRepoInfo = gitRepoInfo()
         this.gitTag = repoInfo.tag || 'latest'
     }
@@ -48,22 +50,25 @@ class DockerInfra implements ImageInfra {
             core.info(
                 `Building Docker image using file ${this.dockerFilePath}/Dockerfile-${this.imageSuffix} to tag it as ${this.imageBaseName}:${tag}`
             )
-            const buildState = await commandRunner(
-                'docker',
-                [
-                    'build',
-                    '.',
-                    '--pull',
-                    '--no-cache',
-                    '-f',
-                    `${this.dockerFilePath}/Dockerfile-${this.imageSuffix}`,
-                    '-t',
-                    `${this.imageBaseName}:${tag}`
-                ],
-                false,
-                null,
-                null
-            )
+            const args = [
+                'build',
+                '.',
+                '--pull',
+                '--no-cache',
+                '-f',
+                `${this.dockerFilePath}/Dockerfile-${this.imageSuffix}`,
+                '-t',
+                `${this.imageBaseName}:${tag}`
+            ]
+            if (this.buildArgs !== undefined && this.buildArgs.length > 0) {
+                const argParts = this.buildArgs.split(',')
+                if (argParts.length > 0) {
+                    for (const a of argParts) {
+                        args.push(...['--build-arg', a])
+                    }
+                }
+            }
+            const buildState = await commandRunner('docker', args, false, null, null)
             if (buildState !== 0) {
                 throw new Error(`Failed to build docker image for ${this.imageBaseName}:${tag}`)
             }

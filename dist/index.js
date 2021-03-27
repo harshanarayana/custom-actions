@@ -681,6 +681,7 @@ class DockerInfra {
         this.imageBaseName = core.getInput('docker-image-base-name');
         this.dockerFilePath = core.getInput('dockerfile-base-dir');
         this.push = core.getInput('push-images') === 'true';
+        this.buildArgs = core.getInput('docker-build-args');
         const repoInfo = git_repo_info_1.default();
         this.gitTag = repoInfo.tag || 'latest';
     }
@@ -692,7 +693,7 @@ class DockerInfra {
                     continue;
                 }
                 core.info(`Building Docker image using file ${this.dockerFilePath}/Dockerfile-${this.imageSuffix} to tag it as ${this.imageBaseName}:${tag}`);
-                const buildState = yield generic_1.commandRunner('docker', [
+                const args = [
                     'build',
                     '.',
                     '--pull',
@@ -701,7 +702,16 @@ class DockerInfra {
                     `${this.dockerFilePath}/Dockerfile-${this.imageSuffix}`,
                     '-t',
                     `${this.imageBaseName}:${tag}`
-                ], false, null, null);
+                ];
+                if (this.buildArgs !== undefined && this.buildArgs.length > 0) {
+                    const argParts = this.buildArgs.split(',');
+                    if (argParts.length > 0) {
+                        for (const a of argParts) {
+                            args.push(...['--build-arg', a]);
+                        }
+                    }
+                }
+                const buildState = yield generic_1.commandRunner('docker', args, false, null, null);
                 if (buildState !== 0) {
                     throw new Error(`Failed to build docker image for ${this.imageBaseName}:${tag}`);
                 }
