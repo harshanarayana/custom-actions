@@ -105,7 +105,7 @@ class ToxInfra implements TestInfra {
                 core.info('You are on a non tox repository. No action to be performed')
                 return 0
             }
-            if (valid === InvalidToxEnv) {
+            if (valid === InvalidToxEnv && !process.platform.startsWith('win')) {
                 throw new Error(`Invalid Test Environment for tox specified as ${this.argMap.get('-e')}`)
             }
             additionalArg.push(...['-e', this.envName()])
