@@ -1669,10 +1669,10 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
         }
         let stderr = undefined;
         let stdout = undefined;
-        if (stderrCallback === undefined && errLineCallback === undefined) {
+        if (stderrCallback === null && errLineCallback === null) {
             stderr = process.stderr;
         }
-        if (stdoutCallback === undefined && stdLineCallback === undefined) {
+        if (stdoutCallback === null && stdLineCallback === null) {
             stdout = process.stdout;
         }
         const opts = {
@@ -1697,7 +1697,7 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
             const out = yield execa_1.default(cmd, args, opts);
             core.info(`Command : ${cmdToLog} finished with ${out.exitCode}`);
             if (out.exitCode !== 0) {
-                if (out.stderr !== undefined) {
+                if (out.stderr !== null) {
                     core.error(out.stderr);
                     if (stderrCallback !== null) {
                         stderrCallback(Buffer.from(out.stderr, 'utf-8'));
@@ -1708,7 +1708,7 @@ function execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, stdL
                 }
             }
             else {
-                if (out.stdout !== undefined) {
+                if (out.stdout !== null) {
                     core.info(out.stdout);
                     if (stdoutCallback !== null) {
                         stdoutCallback(Buffer.from(out.stdout, 'utf-8'));

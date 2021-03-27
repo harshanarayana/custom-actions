@@ -162,12 +162,13 @@ export async function execaCommandRunner(
     }
     let stderr: execa.StdioOption = undefined
     let stdout: execa.StdioOption = undefined
-    if (stderrCallback === undefined && errLineCallback === undefined) {
+    if (stderrCallback === null && errLineCallback === null) {
         stderr = process.stderr
     }
-    if (stdoutCallback === undefined && stdLineCallback === undefined) {
+    if (stdoutCallback === null && stdLineCallback === null) {
         stdout = process.stdout
     }
+
     const opts: execa.Options = {
         cleanup: true,
         stdout,
@@ -191,7 +192,7 @@ export async function execaCommandRunner(
         const out = await execa(cmd, args, opts)
         core.info(`Command : ${cmdToLog} finished with ${out.exitCode}`)
         if (out.exitCode !== 0) {
-            if (out.stderr !== undefined) {
+            if (out.stderr !== null) {
                 core.error(out.stderr)
                 if (stderrCallback !== null) {
                     stderrCallback(Buffer.from(out.stderr, 'utf-8'))
@@ -201,7 +202,7 @@ export async function execaCommandRunner(
                 }
             }
         } else {
-            if (out.stdout !== undefined) {
+            if (out.stdout !== null) {
                 core.info(out.stdout)
                 if (stdoutCallback !== null) {
                     stdoutCallback(Buffer.from(out.stdout, 'utf-8'))
