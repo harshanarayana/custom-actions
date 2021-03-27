@@ -188,8 +188,25 @@ export async function execaCommandRunner(
     }
 
     core.info(`Running Base command: ${cmdToLog}`)
+    const subCommand = execa(cmd, args, opts)
+    let timeout = parseInt(core.getInput('command-timeout'))
+    if (isNaN(timeout)) {
+        timeout = 0
+    }
+    const envTimeout = process.env.COMMAND_TIMEOUT
+    if (envTimeout !== undefined && envTimeout !== null) {
+        const t = parseInt(envTimeout)
+        if (!isNaN(t)) {
+            timeout = t
+        }
+    }
+    if (timeout > 0) {
+        setTimeout(() => {
+            subCommand.cancel()
+        }, timeout)
+    }
     try {
-        const out = await execa(cmd, args, opts)
+        const out = await subCommand
         core.info(`Command : ${cmdToLog} finished with ${out.exitCode}`)
         if (out.exitCode !== 0) {
             if (out.stderr !== null) {
@@ -215,6 +232,7 @@ export async function execaCommandRunner(
         return Promise.resolve(out.exitCode)
     } catch (e) {
         core.info(`cmd: ${cmdToLog} finished with ${e.stack}`)
+        core.info(`Command Cancel State: ${subCommand.killed}`)
         if (core.getInput('experimental-ignore-error') === 'true') {
             core.info(`Ignoring the failure of command ${cmdToLog} as it is marked as experimental feature`)
             return Promise.resolve(0)

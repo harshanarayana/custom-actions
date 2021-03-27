@@ -22,3 +22,17 @@ test('JSON Path Extraction for GitHub Issue Number', async () => {
     const number = await getIssueNumber(data)
     expect(number).toBe(23)
 })
+
+test('Long Running Command With Timeout', async () => {
+    process.env.COMMAND_TIMEOUT = '2'
+    const state = await execaCommandRunner(
+        'bash',
+        ['-c', 'sleep infinity'],
+        new Map<string, string>(),
+        null,
+        null,
+        null,
+        null
+    )
+    expect(state).toBeGreaterThan(0)
+}, 300000)

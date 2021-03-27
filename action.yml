@@ -168,6 +168,10 @@ inputs:
     required: false
     description: 'Enable Experimental Python Workflow where errors can be ignored'
     default: 'false'
+  command-timeout:
+    required: false
+    description: 'Timeout for Individual Command so that It can be terminated internally'
+    default: '0'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."
