@@ -673,7 +673,8 @@ class DockerInfra {
         this.force = false;
         this.name = 'docker';
         this.version = '';
-        this.imageSuffix = core.getInput('docker-image-suffix');
+        this.imagePrefix = core.getInput('docker-image-prefix');
+        this.fileSuffix = core.getInput('docker-file-suffix');
         this.tagAsLatest = core.getInput('tag-image-as-latest') === 'true';
         this.registryUser = core.getInput('registry-auth-user');
         this.registryPassword = core.getInput('registry-auth-password');
@@ -688,23 +689,30 @@ class DockerInfra {
     }
     buildImage() {
         return __awaiter(this, void 0, void 0, function* () {
-            let tags = [`${this.imageSuffix}-${this.gitTag}`, `${this.imageSuffix}-latest`];
+            let tags = [`${this.gitTag}`, `${this.gitTag}-latest`];
+            if (this.imagePrefix !== undefined && this.imagePrefix.length > 0) {
+                tags = [`${this.imagePrefix}-${this.gitTag}`, `${this.imagePrefix}-latest`];
+            }
             if (this.imageTag !== undefined && this.imageTag.length > 0) {
                 tags = [this.imageTag];
             }
+            let imageFile = `${this.dockerFilePath}/Dockerfile`;
+            if (this.fileSuffix !== undefined && this.fileSuffix.length > 0) {
+                imageFile = `${this.dockerFilePath}/Dockerfile-${this.imagePrefix}`;
+            }
             for (const tag of tags) {
-                if (tag.endsWith('-latest') && !this.tagAsLatest) {
+                if (tag.endsWith('latest') && !this.tagAsLatest) {
                     core.info('Since tag-image-as-latest property is not set to true, the image will not be tagged as latest');
                     continue;
                 }
-                core.info(`Building Docker image using file ${this.dockerFilePath}/Dockerfile-${this.imageSuffix} to tag it as ${this.imageBaseName}:${tag}`);
+                core.info(`Building Docker image using file ${imageFile} to tag it as ${this.imageBaseName}:${tag}`);
                 const args = [
                     'build',
                     '.',
                     '--pull',
                     '--no-cache',
                     '-f',
-                    `${this.dockerFilePath}/Dockerfile-${this.imageSuffix}`,
+                    `${imageFile}`,
                     '-t',
                     `${this.imageBaseName}:${tag}`
                 ];
@@ -744,7 +752,7 @@ class DockerInfra {
                 return Promise.resolve(undefined);
             }
             yield this.login();
-            for (const tag of [`${this.imageSuffix}-${this.gitTag}`, `${this.imageSuffix}-latest`]) {
+            for (const tag of [`${this.imagePrefix}-${this.gitTag}`, `${this.imagePrefix}-latest`]) {
                 if (tag.endsWith('-latest') && !this.tagAsLatest) {
                     core.info('Since tag-image-as-latest property is not set to true, the image will not be published as latest');
                     continue;

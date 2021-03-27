@@ -34,16 +34,17 @@ jobs:
     name: Run Docker Image Build Tests
     strategy:
       matrix:
-        docker-image-suffix: [ py37, py38 ]
+        docker-image-prefix: [ py37, py38 ]
     steps:
       - uses: actions/checkout@v2
         name: Checkout the Repository
       - uses: harshanarayana/custom-actions@main
-        name: Run Docker Build for ${{ matrix.docker-image-suffix }}
+        name: Run Docker Build for ${{ matrix.docker-image-prefix }}
         id: build-image
         with:
           dockerfile-base-dir: './docker'
-          docker-image-suffix: ${{ matrix.docker-image-suffix }}
+          docker-image-prefix: ${{ matrix.docker-image-prefix }}
+          docker-file-suffix: ${{ matrix.docker-image-prefix }}
           action: 'image-publish'
           ignore-python-setup: 'true'
           docker-image-base-name: harshanarayana/custom-actions

@@ -84,9 +84,13 @@ inputs:
     required: false
     description: 'Use a specified version of Pip for Setting up the infra'
     default: 'latest'
-  docker-image-suffix:
+  docker-file-suffix:
     required: false
-    description: 'Unique Identifier to indicate which Dockerfile-py37 to use for build the Image'
+    description: 'Suffix for the Dockerfile in Dockerfile-<suffix> format'
+    default: ''
+  docker-image-prefix:
+    required: false
+    description: 'Common Prefix used to append to the generated image tag'
     default: 'py37'
   tag-image-as-latest:
     required: false

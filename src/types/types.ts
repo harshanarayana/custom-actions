@@ -35,7 +35,7 @@ export interface PackagePublishInfra extends BaseInfra {
 
 export interface ImageInfra extends BaseInfra {
     tagAsLatest: boolean
-    imageSuffix: string
+    imagePrefix: string
     gitTag: string
     registryUser: string
     registryPassword: string
