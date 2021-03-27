@@ -17,7 +17,9 @@ class ToxInfra implements TestInfra {
         this.force = force
         this.additionalArgs = additionalArg
         this.argMap = argToMap(additionalArg)
-        core.info(`Args Map ${this.argMap}`)
+        for (const k of this.argMap.keys()) {
+            core.info(`Tox Runtime Argument key: ${k} value: ${this.argMap.get(k)}`)
+        }
     }
 
     async isToxEnv(): Promise<boolean> {
@@ -111,6 +113,19 @@ class ToxInfra implements TestInfra {
         const conf = this.argMap.get('-c')
         if (conf !== undefined && conf.length > 0) {
             additionalArg.push(...['-c', conf])
+        }
+        for (const k of this.argMap.keys()) {
+            if (k === '-c' || k === '-e') {
+                continue
+            }
+            const v = this.argMap.get(k)
+            if (v === undefined) {
+                additionalArg.push(...[k])
+            } else if (v.length < 1) {
+                additionalArg.push(...[k])
+            } else {
+                additionalArg.push(...[k, v])
+            }
         }
         const state = await commandRunner('tox', additionalArg, true, null, null)
 

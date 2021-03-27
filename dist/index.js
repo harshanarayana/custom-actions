@@ -1376,7 +1376,9 @@ class ToxInfra {
         this.force = force;
         this.additionalArgs = additionalArg;
         this.argMap = generic_1.argToMap(additionalArg);
-        core.info(`Args Map ${this.argMap}`);
+        for (const k of this.argMap.keys()) {
+            core.info(`Tox Runtime Argument key: ${k} value: ${this.argMap.get(k)}`);
+        }
     }
     isToxEnv() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1467,6 +1469,21 @@ class ToxInfra {
             const conf = this.argMap.get('-c');
             if (conf !== undefined && conf.length > 0) {
                 additionalArg.push(...['-c', conf]);
+            }
+            for (const k of this.argMap.keys()) {
+                if (k === '-c' || k === '-e') {
+                    continue;
+                }
+                const v = this.argMap.get(k);
+                if (v === undefined) {
+                    additionalArg.push(...[k]);
+                }
+                else if (v.length < 1) {
+                    additionalArg.push(...[k]);
+                }
+                else {
+                    additionalArg.push(...[k, v]);
+                }
             }
             const state = yield generic_1.commandRunner('tox', additionalArg, true, null, null);
             if (state !== 0) {

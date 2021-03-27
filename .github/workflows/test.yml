@@ -7,7 +7,7 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-  build:
+  buildInfra:
     runs-on: ubuntu-latest
     name: Basic Build Test for the Repository
     steps:
@@ -19,7 +19,7 @@ jobs:
       - run: |
           npm run all
         name: Run NPM Tasks
-  test: # make sure the action works on a clean machine without building
+  testBasicPythonSetup: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     name: Run Basic Actions from the Repo
     steps:
@@ -29,7 +29,7 @@ jobs:
         name: Run Basic Python Infrastructure Setup Action
         with:
           python-version: 3.7
-  build-image:
+  buildDockerImage:
     runs-on: ubuntu-latest
     name: Run Docker Image Build Tests
     strategy:
