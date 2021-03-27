@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {ExecOptions} from '@actions/exec/lib/interfaces'
 import * as exec from '@actions/exec'
 import * as core from '@actions/core'
@@ -48,7 +47,8 @@ function createExecOpts(
     errLineCallback: ((data: string) => void) | null
 ): ExecOptions {
     const opts: ExecOptions = {
-        silent: true
+        silent: true,
+        ignoreReturnCode: core.getInput('experimental-ignore-error') === 'true'
     }
     if (bufferMode) {
         opts.listeners = {
@@ -78,6 +78,15 @@ function createExecOpts(
     return opts
 }
 
+async function wrappedRunner(cmd: string, args: string[], opts: ExecOptions): Promise<number> {
+    const st = await exec.exec(cmd, args, opts)
+    if (opts.ignoreReturnCode) {
+        core.info('Ignoring Exit code from command as it is marked as experimental workflow')
+        return Promise.resolve(0)
+    }
+    return Promise.resolve(st)
+}
+
 export async function commandRunnerWithEnv(
     cmd: string,
     args: string[],
@@ -89,7 +98,7 @@ export async function commandRunnerWithEnv(
     const opts = createExecOpts(true, silent, env, stdoutCallback, stderrCallback, null, null)
     const status = await execaCommandRunner(cmd, args, env, stdoutCallback, stderrCallback, null, null)
     if (status === 237) {
-        return await exec.exec(cmd, args, opts)
+        return await wrappedRunner(cmd, args, opts)
     } else {
         return Promise.resolve(status)
     }
@@ -113,7 +122,7 @@ export async function commandRunner(
         null
     )
     if (status === 237) {
-        return await exec.exec(cmd, args, opts)
+        return await wrappedRunner(cmd, args, opts)
     } else {
         return Promise.resolve(status)
     }
@@ -130,7 +139,7 @@ export async function commandRunnerWithLineCallback(
     const opts = createExecOpts(false, silent, env, null, null, stdLineCallback, errLineCallback)
     const status = await execaCommandRunner(cmd, args, env, null, null, stdLineCallback, errLineCallback)
     if (status === 237) {
-        return await exec.exec(cmd, args, opts)
+        return await wrappedRunner(cmd, args, opts)
     } else {
         return Promise.resolve(status)
     }
@@ -205,6 +214,10 @@ export async function execaCommandRunner(
         return Promise.resolve(out.exitCode)
     } catch (e) {
         core.info(`cmd: ${cmdToLog} finished with ${e.stack}`)
+        if (core.getInput('experimental-ignore-error') === 'true') {
+            core.info(`Ignoring the failure of command ${cmdToLog} as it is marked as experimental feature`)
+            return Promise.resolve(0)
+        }
     }
     return Promise.resolve(237)
 }

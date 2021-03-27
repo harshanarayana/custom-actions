@@ -148,6 +148,10 @@ inputs:
     required: false
     description: 'GitHub Access Token for interacting with Git Infra'
     default: ''
+  experimental-ignore-error:
+    required: false
+    description: 'Enable Experimental Python Workflow where errors can be ignored'
+    default: 'false'
 outputs:
   python-version:
     description: "The installed python version. Useful when given a version range as input."

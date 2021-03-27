@@ -28,7 +28,6 @@ export interface PackagePublishInfra extends BaseInfra {
     verifyMetadata: boolean
     skipExisting: boolean
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setupPreRequisites(infra: BaseInfra): Promise<number>
     runPackagePublish(): Promise<number>
     validate(): Promise<boolean>

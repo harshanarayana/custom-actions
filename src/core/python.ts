@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as finder from 'setup-python/src/find-python'
+import * as finderPypy from 'setup-python/src/find-pypy'
 import os from 'os'
 import {getPipInfra} from '../package-infra/pip'
 import {installPythonPackage} from './comon'
@@ -18,12 +19,26 @@ export async function setupPythonInfra(): Promise<InstalledVersion | void> {
     const version = core.getInput('python-version')
     const arch = os.arch()
     const pipVersion = core.getInput('pip-version')
-    core.info(`##[python-install] Installing Python Version ${version} on ${arch}`)
-    const installed = await finder.findPythonVersion(version, arch)
-    core.info(`##[python-install] Successfully setup ${installed.impl} (${installed.version})`)
+    let pyImpl: string
+    let pyVersion: string
+    if (version.startsWith('pypy')) {
+        core.info(`##[pypy-python-install] Installing Python Version ${version} on ${arch}`)
+        const installed = await finderPypy.findPyPyVersion(version, arch)
+        core.info(
+            `##[pypy-python-install] Successfully setup ${installed.resolvedPyPyVersion} (${installed.resolvedPythonVersion})`
+        )
+        pyImpl = installed.resolvedPyPyVersion
+        pyVersion = installed.resolvedPythonVersion
+    } else {
+        core.info(`##[python-install] Installing Python Version ${version} on ${arch}`)
+        const installed = await finder.findPythonVersion(version, arch)
+        core.info(`##[python-install] Successfully setup ${installed.impl} (${installed.version})`)
+        pyImpl = installed.impl
+        pyVersion = installed.version
+    }
     const pipInfra = getPipInfra(pipVersion)
     await installPythonPackage(pipInfra)
     const buildInfra = getBuildToolInfra('latest')
     await installPythonPackage(buildInfra)
-    return {impl: installed.impl, version: installed.version}
+    return {impl: pyImpl, version: pyVersion}
 }

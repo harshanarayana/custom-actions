@@ -58,7 +58,6 @@ class ToxInfra implements TestInfra {
             'tox',
             ['-l'],
             true,
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             (function (out: string[]): (data: Buffer) => void {
                 return (data: Buffer) => {
                     const bData = data.toString().trim()
