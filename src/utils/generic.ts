@@ -265,3 +265,7 @@ export async function getIssueNumber(jsonString: string): Promise<number> {
     const issueNumber = jsonPath.JSONPath({path: issuePathFilter, json: JSON.parse(jsonString)})[0]
     return Promise.resolve(parseInt(issueNumber.toString()))
 }
+
+export function getNumberRange(count: number): number[] {
+    return [...Array(count).keys()]
+}

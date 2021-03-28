@@ -1374,6 +1374,7 @@ class ToxInfra {
         this.name = 'tox';
         this.version = version;
         this.force = force;
+        this.retry = parseInt(core.getInput('test-failure-retry'));
         this.additionalArgs = additionalArg;
         this.argMap = generic_1.argToMap(additionalArg);
         for (const k of this.argMap.keys()) {
@@ -1483,11 +1484,22 @@ class ToxInfra {
                     additionalArg.push(...[k, v]);
                 }
             }
-            const state = yield generic_1.commandRunner('tox', additionalArg, true, null, null);
-            if (state !== 0) {
-                throw new Error(`Tox Environment ${this.envName()} run completed with an exit code ${state}`);
+            if (isNaN(this.retry) || this.retry < 1) {
+                this.retry = 1;
             }
-            return state;
+            const retry = [...Array(this.retry).keys()];
+            for (let attempt = 1; attempt <= retry.length; attempt++) {
+                core.startGroup(`[Attempt ${attempt}] Run Unit Tests using Tox`);
+                const state = yield generic_1.commandRunner('tox', additionalArg, true, null, null);
+                core.endGroup();
+                if (state === 0) {
+                    return Promise.resolve(state);
+                }
+                else if (attempt >= retry.length) {
+                    throw new Error(`Tox Environment ${this.envName()} run completed with an exit code ${state}`);
+                }
+            }
+            return Promise.resolve(1);
         });
     }
     setVersion() {
@@ -1545,7 +1557,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getIssueNumber = exports.readEventData = exports.execaCommandRunner = exports.commandRunnerWithLineCallback = exports.commandRunner = exports.commandRunnerWithEnv = exports.argToMap = void 0;
+exports.getNumberRange = exports.getIssueNumber = exports.readEventData = exports.execaCommandRunner = exports.commandRunnerWithLineCallback = exports.commandRunner = exports.commandRunnerWithEnv = exports.argToMap = void 0;
 const exec = __importStar(__webpack_require__(1514));
 const core = __importStar(__webpack_require__(2186));
 const execa_1 = __importDefault(__webpack_require__(5447));
@@ -1780,6 +1792,10 @@ function getIssueNumber(jsonString) {
     });
 }
 exports.getIssueNumber = getIssueNumber;
+function getNumberRange(count) {
+    return [...Array(count).keys()];
+}
+exports.getNumberRange = getNumberRange;
 
 
 /***/ }),

@@ -1,4 +1,4 @@
-import {execaCommandRunner, getIssueNumber} from '../src/utils/generic'
+import {execaCommandRunner, getIssueNumber, getNumberRange} from '../src/utils/generic'
 import * as fs from 'fs'
 import {promisify} from 'util'
 
@@ -36,3 +36,20 @@ test('Long Running Command With Timeout', async () => {
     )
     expect(state).toBeGreaterThan(0)
 }, 300000)
+
+test('Retry Some Commands', async () => {
+    const retry = getNumberRange(10)
+    for (let attempt = 0; attempt <= retry.length; attempt++) {
+        console.log(`Attempt ${attempt}`)
+        const state = await execaCommandRunner(
+            'bash',
+            ['invlidcommand'],
+            new Map<string, string>(),
+            null,
+            null,
+            null,
+            null
+        )
+        expect(state).toBeGreaterThan(0)
+    }
+})

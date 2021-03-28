@@ -25,6 +25,10 @@ inputs:
     required: false
     description: 'Force Install the Test tool even if the Env does not need it'
     default: "false"
+  test-failure-retry:
+    required: false
+    description: 'Number of Retries to be performed on a failed tests. This is to account for some flaky tests'
+    default: '0'
   linter-infra-tool:
     required: false
     description: 'Tool used to perming linting operation on the repository'

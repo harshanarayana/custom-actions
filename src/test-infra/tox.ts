@@ -10,11 +10,13 @@ class ToxInfra implements TestInfra {
     version: string
     additionalArgs: string
     argMap: Map<string, string> = new Map<string, string>()
+    retry: number
 
     constructor(version: string, force: boolean, additionalArg: string) {
         this.name = 'tox'
         this.version = version
         this.force = force
+        this.retry = parseInt(core.getInput('test-failure-retry'))
         this.additionalArgs = additionalArg
         this.argMap = argToMap(additionalArg)
         for (const k of this.argMap.keys()) {
@@ -127,12 +129,21 @@ class ToxInfra implements TestInfra {
                 additionalArg.push(...[k, v])
             }
         }
-        const state = await commandRunner('tox', additionalArg, true, null, null)
-
-        if (state !== 0) {
-            throw new Error(`Tox Environment ${this.envName()} run completed with an exit code ${state}`)
+        if (isNaN(this.retry) || this.retry < 1) {
+            this.retry = 1
         }
-        return state
+        const retry = [...Array(this.retry).keys()]
+        for (let attempt = 1; attempt <= retry.length; attempt++) {
+            core.startGroup(`[Attempt ${attempt}] Run Unit Tests using Tox`)
+            const state = await commandRunner('tox', additionalArg, true, null, null)
+            core.endGroup()
+            if (state === 0) {
+                return Promise.resolve(state)
+            } else if (attempt >= retry.length) {
+                throw new Error(`Tox Environment ${this.envName()} run completed with an exit code ${state}`)
+            }
+        }
+        return Promise.resolve(1)
     }
 
     async setVersion(): Promise<number> {
