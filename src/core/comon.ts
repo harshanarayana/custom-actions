@@ -31,7 +31,7 @@ export async function installPythonPackage(infra: BaseInfra): Promise<number> {
         if (pipExtraArgs) {
             pipArgs.push(pipExtraArgs)
         }
-        state = await exec.exec('pip', pipArgs, options)
+        state = await exec.exec('python -m pip', pipArgs, options)
         if (state !== 0) {
             throw new Error(`Error setting up ${infra.name} installation for version ${infra.version}`)
         }
