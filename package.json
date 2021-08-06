@@ -32,7 +32,7 @@
     "execa": "^5.0.0",
     "git-repo-info": "^2.1.1",
     "jsonpath-plus": "^5.0.4",
-    "node-jq": "^1.12.0",
+    "node-jq": "^2.0.0",
     "setup-python": "git+https://github.com/actions/setup-python.git"
   },
   "devDependencies": {
