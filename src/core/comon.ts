@@ -21,11 +21,17 @@ export async function installPythonPackage(infra: BaseInfra): Promise<number> {
             }
         }
         let state: number
+        const pipArgs = ['install', '--upgrade', ]
         if (infra.version.startsWith('latest')) {
-            state = await exec.exec('pip', ['install', '--upgrade', infra.name], options)
+            pipArgs.push(infra.name)
         } else {
-            state = await exec.exec('pip', ['install', '--upgrade', `${infra.name}==${infra.version}`], options)
+            pipArgs.push(`${infra.name}==${infra.version}`)
         }
+        const pipExtraArgs = core.getInput('pip-extra-args')
+        if (pipExtraArgs) {
+            pipArgs.push(pipExtraArgs)
+        }
+        state = await exec.exec('python -m pip', pipArgs, options)
         if (state !== 0) {
             throw new Error(`Error setting up ${infra.name} installation for version ${infra.version}`)
         }
