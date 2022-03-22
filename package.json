@@ -28,7 +28,7 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@actions/glob": "^0.1.1",
-    "@actions/io": "^1.0.2",
+    "@actions/io": "^1.1.2",
     "execa": "^5.0.0",
     "git-repo-info": "^2.1.1",
     "jsonpath-plus": "^5.0.4",
